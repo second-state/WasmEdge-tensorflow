@@ -9,6 +9,8 @@ namespace Host {
 
 class SSVMTensorflowEnvironment {
 public:
+  std::vector<std::string> Inputs;
+  std::vector<std::string> Outputs;
   std::stringstream Res;
 };
 
