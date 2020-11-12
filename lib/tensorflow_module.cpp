@@ -8,6 +8,22 @@ namespace SSVM {
 namespace Host {
 
 SSVMTensorflowModule::SSVMTensorflowModule() : ImportObject("ssvm_tensorflow") {
+  addHostFunc("ssvm_tensorflow_load_jpg_to_rgb8",
+              std::make_unique<SSVMTensorflowLoadJPGToRGB8>(Env));
+  addHostFunc("ssvm_tensorflow_load_jpg_to_bgr8",
+              std::make_unique<SSVMTensorflowLoadJPGToBGR8>(Env));
+  addHostFunc("ssvm_tensorflow_load_jpg_to_rgb32f",
+              std::make_unique<SSVMTensorflowLoadJPGToRGB32F>(Env));
+  addHostFunc("ssvm_tensorflow_load_jpg_to_bgr32f",
+              std::make_unique<SSVMTensorflowLoadJPGToBGR32F>(Env));
+  addHostFunc("ssvm_tensorflow_load_png_to_rgb8",
+              std::make_unique<SSVMTensorflowLoadPNGToRGB8>(Env));
+  addHostFunc("ssvm_tensorflow_load_png_to_bgr8",
+              std::make_unique<SSVMTensorflowLoadPNGToBGR8>(Env));
+  addHostFunc("ssvm_tensorflow_load_png_to_rgb32f",
+              std::make_unique<SSVMTensorflowLoadPNGToRGB32F>(Env));
+  addHostFunc("ssvm_tensorflow_load_png_to_bgr32f",
+              std::make_unique<SSVMTensorflowLoadPNGToBGR32F>(Env));
   addHostFunc("ssvm_tensorflow_run_vision",
               std::make_unique<SSVMTensorflowRunVision>(Env));
   addHostFunc("ssvm_tensorflow_append_input",

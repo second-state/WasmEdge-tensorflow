@@ -13,6 +13,8 @@ find_package(TensorFlow REQUIRED)
 find_package(Boost "1.68.0" REQUIRED)
 set(JPEG_NAMES libjpeg.a)
 find_package(JPEG REQUIRED)
+set(PNG_NAMES libpng.a)
+find_package(PNG REQUIRED)
 find_package(Filesystem REQUIRED Final Experimental)
 
 # Clone ssvm-core

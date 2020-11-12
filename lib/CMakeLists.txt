@@ -9,6 +9,7 @@ target_link_libraries(ssvmHostModuleSSVMTensorflow
   PRIVATE
   ssvmCommon
   ${JPEG_LIBRARIES}
+  ${PNG_LIBRARIES}
   ${TensorFlow_LIBRARIES}
 )
 

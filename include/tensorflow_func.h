@@ -10,13 +10,93 @@
 namespace SSVM {
 namespace Host {
 
+class SSVMTensorflowLoadJPGToRGB8
+    : public SSVMTensorflow<SSVMTensorflowLoadJPGToRGB8> {
+public:
+  SSVMTensorflowLoadJPGToRGB8(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
+class SSVMTensorflowLoadJPGToBGR8
+    : public SSVMTensorflow<SSVMTensorflowLoadJPGToBGR8> {
+public:
+  SSVMTensorflowLoadJPGToBGR8(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
+class SSVMTensorflowLoadJPGToRGB32F
+    : public SSVMTensorflow<SSVMTensorflowLoadJPGToRGB32F> {
+public:
+  SSVMTensorflowLoadJPGToRGB32F(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
+class SSVMTensorflowLoadJPGToBGR32F
+    : public SSVMTensorflow<SSVMTensorflowLoadJPGToBGR32F> {
+public:
+  SSVMTensorflowLoadJPGToBGR32F(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
+class SSVMTensorflowLoadPNGToRGB8
+    : public SSVMTensorflow<SSVMTensorflowLoadPNGToRGB8> {
+public:
+  SSVMTensorflowLoadPNGToRGB8(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
+class SSVMTensorflowLoadPNGToBGR8
+    : public SSVMTensorflow<SSVMTensorflowLoadPNGToBGR8> {
+public:
+  SSVMTensorflowLoadPNGToBGR8(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
+class SSVMTensorflowLoadPNGToRGB32F
+    : public SSVMTensorflow<SSVMTensorflowLoadPNGToRGB32F> {
+public:
+  SSVMTensorflowLoadPNGToRGB32F(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
+class SSVMTensorflowLoadPNGToBGR32F
+    : public SSVMTensorflow<SSVMTensorflowLoadPNGToBGR32F> {
+public:
+  SSVMTensorflowLoadPNGToBGR32F(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TargetImgW, uint32_t TargetImgH);
+};
+
 class SSVMTensorflowRunVision : public SSVMTensorflow<SSVMTensorflowRunVision> {
 public:
   SSVMTensorflowRunVision(SSVMTensorflowEnvironment &Env)
       : SSVMTensorflow(Env) {}
   Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint32_t ModBufPtr, uint32_t ModBufLen,
-                        uint32_t ImgBufPtr, uint32_t ImgBufLen,
+                        uint32_t TensorBufPtr, uint32_t TensorBufLen,
                         uint32_t TargetImgW, uint32_t TargetImgH);
 };
 
