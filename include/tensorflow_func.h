@@ -106,7 +106,8 @@ public:
   SSVMTensorflowAppendInput(SSVMTensorflowEnvironment &Env)
       : SSVMTensorflow(Env) {}
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst,
-                    uint32_t InputPtr, uint32_t InputLen);
+                    uint32_t InputPtr, uint32_t InputLen, uint32_t DimPtr,
+                    uint32_t DimCnt, uint32_t Idx);
 };
 
 class SSVMTensorflowAppendOutput
@@ -115,7 +116,23 @@ public:
   SSVMTensorflowAppendOutput(SSVMTensorflowEnvironment &Env)
       : SSVMTensorflow(Env) {}
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst,
-                    uint32_t OutputPtr, uint32_t OutputLen);
+                    uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx);
+};
+
+class SSVMTensorflowClearInput
+    : public SSVMTensorflow<SSVMTensorflowClearInput> {
+public:
+  SSVMTensorflowClearInput(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst);
+};
+
+class SSVMTensorflowClearOutput
+    : public SSVMTensorflow<SSVMTensorflowClearOutput> {
+public:
+  SSVMTensorflowClearOutput(SSVMTensorflowEnvironment &Env)
+      : SSVMTensorflow(Env) {}
+  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst);
 };
 
 class SSVMTensorflowGetResultLen
@@ -123,14 +140,15 @@ class SSVMTensorflowGetResultLen
 public:
   SSVMTensorflowGetResultLen(SSVMTensorflowEnvironment &Env)
       : SSVMTensorflow(Env) {}
-  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst);
+  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
+                        uint32_t Index);
 };
 
 class SSVMTensorflowGetResult : public SSVMTensorflow<SSVMTensorflowGetResult> {
 public:
   SSVMTensorflowGetResult(SSVMTensorflowEnvironment &Env)
       : SSVMTensorflow(Env) {}
-  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst,
+  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint32_t Index,
                     uint32_t BufPtr);
 };
 

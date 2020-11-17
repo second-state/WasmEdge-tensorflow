@@ -56,11 +56,17 @@ std::vector<float> normalizeImg(Span<const uint8_t> V) {
   return Flat;
 }
 
+/// Helper function to create input tensor
+TF_Tensor *createTensor(TF_DataType Type, Span<const int64_t> Dim,
+                        uint32_t Size) {
+  return TF_AllocateTensor(Type, &Dim[0], Dim.size(), Size);
+}
+
 /// Helper function to run tensorflow session
 bool runTFSession(const char *ModelBuf, uint32_t ModelLen,
-                  std::vector<std::string> &InputNames,
+                  Span<const std::pair<std::string, uint32_t>> InputNames,
                   std::vector<TF_Tensor *> &InTensor,
-                  std::vector<std::string> &OutputNames,
+                  Span<const std::pair<std::string, uint32_t>> OutputNames,
                   std::vector<TF_Tensor *> &OutTensor) {
   /// Tensorflow Status
   TF_Status *Stat = TF_NewStatus();
@@ -83,12 +89,14 @@ bool runTFSession(const char *ModelBuf, uint32_t ModelLen,
   std::vector<TF_Output> Inputs;
   for (auto &S : InputNames) {
     Inputs.emplace_back(
-        TF_Output{TF_GraphOperationByName(Graph, S.c_str()), 0});
+        TF_Output{TF_GraphOperationByName(Graph, S.first.c_str()),
+                  static_cast<int>(S.second)});
   }
   std::vector<TF_Output> Outputs;
   for (auto &S : OutputNames) {
     Outputs.emplace_back(
-        TF_Output{TF_GraphOperationByName(Graph, S.c_str()), 0});
+        TF_Output{TF_GraphOperationByName(Graph, S.first.c_str()),
+                  static_cast<int>(S.second)});
   }
 
   /// Tensorflow Session
@@ -151,11 +159,8 @@ SSVMTensorflowLoadJPGToRGB8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Resized[0]),
-                sizeof(uint8_t) * Resized.size());
+  Env.Res.push_back(resizeImg(Img, TargetImgW, TargetImgH));
   return 0;
 }
 
@@ -173,11 +178,8 @@ SSVMTensorflowLoadJPGToBGR8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Resized[0]),
-                sizeof(uint8_t) * Resized.size());
+  Env.Res.push_back(resizeImg(Img, TargetImgW, TargetImgH));
   return 0;
 }
 
@@ -195,12 +197,12 @@ SSVMTensorflowLoadJPGToRGB32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
+  Env.Res.clear();
   auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   auto Flat = normalizeImg(Resized);
-  Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Flat[0]),
-                sizeof(float) * Flat.size());
+  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
+  Env.Res.emplace_back(
+      std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size()));
   return 0;
 }
 
@@ -218,12 +220,12 @@ SSVMTensorflowLoadJPGToBGR32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
+  Env.Res.clear();
   auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   auto Flat = normalizeImg(Resized);
-  Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Flat[0]),
-                sizeof(float) * Flat.size());
+  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
+  Env.Res.emplace_back(
+      std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size()));
   return 0;
 }
 
@@ -241,11 +243,8 @@ SSVMTensorflowLoadPNGToRGB8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Resized[0]),
-                sizeof(uint8_t) * Resized.size());
+  Env.Res.push_back(resizeImg(Img, TargetImgW, TargetImgH));
   return 0;
 }
 
@@ -263,11 +262,8 @@ SSVMTensorflowLoadPNGToBGR8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Resized[0]),
-                sizeof(uint8_t) * Resized.size());
+  Env.Res.push_back(resizeImg(Img, TargetImgW, TargetImgH));
   return 0;
 }
 
@@ -285,12 +281,12 @@ SSVMTensorflowLoadPNGToRGB32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
+  Env.Res.clear();
   auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   auto Flat = normalizeImg(Resized);
-  Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Flat[0]),
-                sizeof(float) * Flat.size());
+  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
+  Env.Res.emplace_back(
+      std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size()));
   return 0;
 }
 
@@ -308,12 +304,12 @@ SSVMTensorflowLoadPNGToBGR32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
+  Env.Res.clear();
   auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
   auto Flat = normalizeImg(Resized);
-  Env.Res.clear();
-  Env.Res.str("");
-  Env.Res.write(reinterpret_cast<const char *>(&Flat[0]),
-                sizeof(float) * Flat.size());
+  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
+  Env.Res.emplace_back(
+      std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size()));
   return 0;
 }
 
@@ -332,9 +328,7 @@ SSVMTensorflowRunVision::body(Runtime::Instance::MemoryInstance *MemInst,
     LOG(ERROR) << "ssvm_tensorflow_run_vision: Input size must be 1";
     return 1;
   }
-  int64_t Dims[4] = {1, static_cast<int64_t>(TargetImgW),
-                     static_cast<int64_t>(TargetImgH), 3};
-  TF_Tensor *InTensor = TF_AllocateTensor(TF_FLOAT, Dims, 4, TensorBufLen);
+  TF_Tensor *InTensor = createTensor(TF_FLOAT, Env.InputDims[0], TensorBufLen);
   if (InTensor == nullptr) {
     LOG(ERROR) << "ssvm_tensorflow_run_vision: Unable to allocate input tensor";
     return 1;
@@ -357,22 +351,11 @@ SSVMTensorflowRunVision::body(Runtime::Instance::MemoryInstance *MemInst,
 
   /// Print results
   Env.Res.clear();
-  Env.Res.str("");
-  Env.Res << "[";
   for (uint32_t I = 0; I < OutTensors.size(); ++I) {
-    float *OutTensorData = static_cast<float *>(TF_TensorData(OutTensors[I]));
-    uint32_t NOut = TF_TensorByteSize(OutTensors[I]) / sizeof(float);
-    Env.Res << "[";
-    for (uint32_t J = 0; J < NOut - 1; J++) {
-      Env.Res << std::fixed << std::setprecision(20) << OutTensorData[J] << ",";
-    }
-    Env.Res << std::fixed << std::setprecision(20) << OutTensorData[NOut - 1]
-            << "]";
-    if (I < OutTensors.size() - 1) {
-      Env.Res << ",";
-    }
+    uint8_t *Data = static_cast<uint8_t *>(TF_TensorData(OutTensors[I]));
+    Env.Res.emplace_back(
+        std::vector<uint8_t>(Data, Data + TF_TensorByteSize(OutTensors[I])));
   }
-  Env.Res << "]";
 
   /// Free resources
   for (auto &I : InTensors) {
@@ -384,49 +367,73 @@ SSVMTensorflowRunVision::body(Runtime::Instance::MemoryInstance *MemInst,
   return 0;
 }
 
-Expect<void>
-SSVMTensorflowAppendInput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                uint32_t InputPtr, uint32_t InputLen) {
+Expect<void> SSVMTensorflowAppendInput::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint32_t InputPtr,
+    uint32_t InputLen, uint32_t DimPtr, uint32_t DimCnt, uint32_t Idx) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
   Env.Inputs.push_back(
-      std::string(MemInst->getPointer<char *>(InputPtr), InputLen));
+      {std::string(MemInst->getPointer<char *>(InputPtr), InputLen), Idx});
+  if (DimCnt > 0) {
+    int64_t *Dims = MemInst->getPointer<int64_t *>(DimPtr);
+    Env.InputDims.emplace_back(std::vector<int64_t>(Dims, Dims + DimCnt));
+  } else {
+    Env.InputDims.push_back({});
+  }
   return {};
 }
 
 Expect<void>
 SSVMTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                 uint32_t OutputPtr, uint32_t OutputLen) {
+                                 uint32_t OutputPtr, uint32_t OutputLen,
+                                 uint32_t Idx) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
   Env.Outputs.push_back(
-      std::string(MemInst->getPointer<char *>(OutputPtr), OutputLen));
+      {std::string(MemInst->getPointer<char *>(OutputPtr), OutputLen), Idx});
+  return {};
+}
+
+Expect<void>
+SSVMTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst) {
+  Env.Inputs.clear();
+  Env.InputDims.clear();
+  return {};
+}
+
+Expect<void>
+SSVMTensorflowClearOutput::body(Runtime::Instance::MemoryInstance *MemInst) {
+  Env.Outputs.clear();
   return {};
 }
 
 Expect<uint32_t>
-SSVMTensorflowGetResultLen::body(Runtime::Instance::MemoryInstance *MemInst) {
-  return Env.Res.str().size();
+SSVMTensorflowGetResultLen::body(Runtime::Instance::MemoryInstance *MemInst,
+                                 uint32_t Index) {
+  if (Env.Res.size() > Index) {
+    return Env.Res[Index].size();
+  }
+  return 0;
 }
 
 Expect<void>
 SSVMTensorflowGetResult::body(Runtime::Instance::MemoryInstance *MemInst,
-                              uint32_t BufPtr) {
+                              uint32_t Index, uint32_t BufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  char *Buf = MemInst->getPointer<char *>(BufPtr);
-  std::copy_n(Env.Res.str().begin(), Env.Res.str().size(), Buf);
-  Env.Res.clear();
-  Env.Res.str("");
+  uint8_t *Buf = MemInst->getPointer<uint8_t *>(BufPtr);
+  if (Env.Res.size() > Index) {
+    std::copy_n(Env.Res[Index].begin(), Env.Res[Index].size(), Buf);
+  }
   return {};
 }
 

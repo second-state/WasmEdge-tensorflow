@@ -30,6 +30,10 @@ SSVMTensorflowModule::SSVMTensorflowModule() : ImportObject("ssvm_tensorflow") {
               std::make_unique<SSVMTensorflowAppendInput>(Env));
   addHostFunc("ssvm_tensorflow_append_output",
               std::make_unique<SSVMTensorflowAppendOutput>(Env));
+  addHostFunc("ssvm_tensorflow_clear_input",
+              std::make_unique<SSVMTensorflowClearInput>(Env));
+  addHostFunc("ssvm_tensorflow_clear_output",
+              std::make_unique<SSVMTensorflowClearOutput>(Env));
   addHostFunc("ssvm_tensorflow_get_result_len",
               std::make_unique<SSVMTensorflowGetResultLen>(Env));
   addHostFunc("ssvm_tensorflow_get_result",
