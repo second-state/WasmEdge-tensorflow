@@ -24,8 +24,16 @@ SSVMTensorflowModule::SSVMTensorflowModule() : ImportObject("ssvm_tensorflow") {
               std::make_unique<SSVMTensorflowLoadPNGToRGB32F>(Env));
   addHostFunc("ssvm_tensorflow_load_png_to_bgr32f",
               std::make_unique<SSVMTensorflowLoadPNGToBGR32F>(Env));
-  addHostFunc("ssvm_tensorflow_run_vision",
-              std::make_unique<SSVMTensorflowRunVision>(Env));
+  addHostFunc("ssvm_tensorflow_exec_model",
+              std::make_unique<SSVMTensorflowExecModel>(Env));
+  addHostFunc("ssvm_tensorflow_alloc_tensor",
+              std::make_unique<SSVMTensorflowAllocTensor>(Env));
+  addHostFunc("ssvm_tensorflow_delete_tensor",
+              std::make_unique<SSVMTensorflowDeleteTensor>(Env));
+  addHostFunc("ssvm_tensorflow_get_tensor_len",
+              std::make_unique<SSVMTensorflowGetTensorLen>(Env));
+  addHostFunc("ssvm_tensorflow_get_tensor_data",
+              std::make_unique<SSVMTensorflowGetTensorData>(Env));
   addHostFunc("ssvm_tensorflow_append_input",
               std::make_unique<SSVMTensorflowAppendInput>(Env));
   addHostFunc("ssvm_tensorflow_append_output",
