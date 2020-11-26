@@ -52,6 +52,10 @@ else()
   set(SSVM_CORE_SRC_DIR ${SSVM_CORE_PATH})
 endif()
 
+# TensorFlow lite static library
+set(TENSORFLOW_LITE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/utils/ssvm-tensorflow-deps/tflite/libtensorflow-lite.a")
+set(TENSORFLOW_LITE_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/utils/ssvm-tensorflow-deps/")
+
 include_directories(BEFORE
   ${CMAKE_CURRENT_BINARY_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include

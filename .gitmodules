@@ -1,0 +1,3 @@
+[submodule "utils/ssvm-tensorflow-deps"]
+	path = utils/ssvm-tensorflow-deps
+	url = https://github.com/second-state/ssvm-tensorflow-deps.git

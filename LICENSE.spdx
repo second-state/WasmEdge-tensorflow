@@ -13,8 +13,8 @@ DocumentName: LICENSE.spdx
 Creator: Organization: Second State LCC (contact@secondstate.io)
 
 ## Package Information
-PackageName: ssvm-storage
-SPDXID: SPDXRef-ssvm-storage
+PackageName: ssvm-tensorflow
+SPDXID: SPDXRef-ssvm-tensorflow
 PackageOriginator: Organization: Second State LCC (contact@secondstate.io)
 PackageLicenseDeclared: (Apache-2.0)
 FilesAnalyzed: false
