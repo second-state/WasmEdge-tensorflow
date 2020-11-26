@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "common/filesystem.h"
 #include "common/value.h"
-#include "host/wasi/wasimodule.h"
 #include "po/argument_parser.h"
-#include "tensorflow_module.h"
 #include "vm/configure.h"
 #include "vm/vm.h"
+
+#include "host/wasi/wasimodule.h"
+#include "image_module.h"
+#include "tensorflow_module.h"
+
 #include <cstdlib>
 #include <iostream>
 
@@ -53,7 +56,9 @@ int main(int Argc, const char *Argv[]) {
   Conf.addVMType(SSVM::VM::Configure::VMType::SSVM_Process);
   SSVM::VM::VM VM(Conf);
   SSVM::Host::SSVMTensorflowModule TensorflowMod;
+  SSVM::Host::SSVMImageModule ImageMod;
   VM.registerModule(TensorflowMod);
+  VM.registerModule(ImageMod);
 
   SSVM::Host::WasiModule *WasiMod = dynamic_cast<SSVM::Host::WasiModule *>(
       VM.getImportModule(SSVM::VM::Configure::VMType::Wasi));

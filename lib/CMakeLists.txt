@@ -8,14 +8,30 @@ add_library(ssvmHostModuleSSVMTensorflow
 target_link_libraries(ssvmHostModuleSSVMTensorflow
   PRIVATE
   ssvmCommon
-  ${JPEG_LIBRARIES}
-  ${PNG_LIBRARIES}
   ${TensorFlow_LIBRARIES}
 )
 
 target_include_directories(ssvmHostModuleSSVMTensorflow
   PUBLIC
   ${TensorFlow_INCLUDE_DIR}
+  ${SSVM_CORE_SRC_DIR}/include
+  ${SSVM_CORE_SRC_DIR}/thirdparty
+)
+
+add_library(ssvmHostModuleSSVMImage
+  image_module.cpp
+  image_func.cpp
+)
+
+target_link_libraries(ssvmHostModuleSSVMImage
+  PRIVATE
+  ssvmCommon
+  ${JPEG_LIBRARIES}
+  ${PNG_LIBRARIES}
+)
+
+target_include_directories(ssvmHostModuleSSVMImage
+  PUBLIC
   ${Boost_INCLUDE_DIR}
   ${SSVM_CORE_SRC_DIR}/include
   ${SSVM_CORE_SRC_DIR}/thirdparty

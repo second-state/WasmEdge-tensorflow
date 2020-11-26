@@ -15,7 +15,6 @@ public:
   std::vector<std::pair<std::string, uint32_t>> Inputs;
   std::vector<std::pair<std::string, uint32_t>> Outputs;
   std::vector<TF_Tensor *> InputTensors;
-  std::vector<uint8_t> Res;
 };
 
 } // namespace Host

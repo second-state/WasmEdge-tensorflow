@@ -18,6 +18,7 @@ add_executable(ssvm-tensorflow
 target_link_libraries(ssvm-tensorflow
   PRIVATE
   ssvmHostModuleSSVMTensorflow
+  ssvmHostModuleSSVMImage
   ssvmVM
   std::filesystem
 )
