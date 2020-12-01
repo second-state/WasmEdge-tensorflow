@@ -53,8 +53,7 @@ else()
 endif()
 
 # TensorFlow lite static library
-set(TENSORFLOW_LITE_LIB "${CMAKE_CURRENT_SOURCE_DIR}/utils/ssvm-tensorflow-deps/tflite/libtensorflow-lite.a")
-set(TENSORFLOW_LITE_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/utils/ssvm-tensorflow-deps/")
+add_subdirectory(utils/ssvm-tensorflow-deps)
 
 include_directories(BEFORE
   ${CMAKE_CURRENT_BINARY_DIR}/include
