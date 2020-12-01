@@ -18,6 +18,24 @@ target_include_directories(ssvmHostModuleSSVMTensorflow
   ${SSVM_CORE_SRC_DIR}/thirdparty
 )
 
+add_library(ssvmHostModuleSSVMTensorflowLite
+  tensorflowlite_module.cpp
+  tensorflowlite_func.cpp
+)
+
+target_link_libraries(ssvmHostModuleSSVMTensorflowLite
+  PRIVATE
+  ssvmCommon
+  ${TENSORFLOW_LITE_LIB}
+)
+
+target_include_directories(ssvmHostModuleSSVMTensorflowLite
+  PUBLIC
+  ${TENSORFLOW_LITE_INCLUDE}
+  ${SSVM_CORE_SRC_DIR}/include
+  ${SSVM_CORE_SRC_DIR}/thirdparty
+)
+
 add_library(ssvmHostModuleSSVMImage
   image_module.cpp
   image_func.cpp

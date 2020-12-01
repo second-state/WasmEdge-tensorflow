@@ -7,7 +7,6 @@
 
 #include "host/wasi/wasimodule.h"
 #include "image_module.h"
-#include "tensorflow_module.h"
 #include "tensorflowlite_module.h"
 
 #include <cstdlib>
@@ -56,10 +55,8 @@ int main(int Argc, const char *Argv[]) {
   Conf.addVMType(SSVM::VM::Configure::VMType::Wasi);
   Conf.addVMType(SSVM::VM::Configure::VMType::SSVM_Process);
   SSVM::VM::VM VM(Conf);
-  SSVM::Host::SSVMTensorflowModule TensorflowMod;
   SSVM::Host::SSVMTensorflowLiteModule TensorflowLiteMod;
   SSVM::Host::SSVMImageModule ImageMod;
-  VM.registerModule(TensorflowMod);
   VM.registerModule(TensorflowLiteMod);
   VM.registerModule(ImageMod);
 
