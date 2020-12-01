@@ -8,24 +8,26 @@ namespace SSVM {
 namespace Host {
 
 SSVMTensorflowModule::SSVMTensorflowModule() : ImportObject("ssvm_tensorflow") {
-  addHostFunc("ssvm_tensorflow_exec_model",
-              std::make_unique<SSVMTensorflowExecModel>(Env));
-  addHostFunc("ssvm_tensorflow_alloc_tensor",
-              std::make_unique<SSVMTensorflowAllocTensor>(Env));
-  addHostFunc("ssvm_tensorflow_delete_tensor",
-              std::make_unique<SSVMTensorflowDeleteTensor>(Env));
+  addHostFunc("ssvm_tensorflow_create_session",
+              std::make_unique<SSVMTensorflowCreateSession>());
+  addHostFunc("ssvm_tensorflow_delete_session",
+              std::make_unique<SSVMTensorflowDeleteSession>());
+  addHostFunc("ssvm_tensorflow_run_session",
+              std::make_unique<SSVMTensorflowRunSession>());
+  addHostFunc("ssvm_tensorflow_get_output_tensor",
+              std::make_unique<SSVMTensorflowGetOutputTensor>());
   addHostFunc("ssvm_tensorflow_get_tensor_len",
-              std::make_unique<SSVMTensorflowGetTensorLen>(Env));
+              std::make_unique<SSVMTensorflowGetTensorLen>());
   addHostFunc("ssvm_tensorflow_get_tensor_data",
-              std::make_unique<SSVMTensorflowGetTensorData>(Env));
+              std::make_unique<SSVMTensorflowGetTensorData>());
   addHostFunc("ssvm_tensorflow_append_input",
-              std::make_unique<SSVMTensorflowAppendInput>(Env));
+              std::make_unique<SSVMTensorflowAppendInput>());
   addHostFunc("ssvm_tensorflow_append_output",
-              std::make_unique<SSVMTensorflowAppendOutput>(Env));
+              std::make_unique<SSVMTensorflowAppendOutput>());
   addHostFunc("ssvm_tensorflow_clear_input",
-              std::make_unique<SSVMTensorflowClearInput>(Env));
+              std::make_unique<SSVMTensorflowClearInput>());
   addHostFunc("ssvm_tensorflow_clear_output",
-              std::make_unique<SSVMTensorflowClearOutput>(Env));
+              std::make_unique<SSVMTensorflowClearOutput>());
 }
 
 } // namespace Host

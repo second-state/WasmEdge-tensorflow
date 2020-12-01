@@ -11,123 +11,152 @@
 namespace SSVM {
 namespace Host {
 
-namespace {
-/// Helper function to run tensorflow session
-bool runTFSession(const char *ModelBuf, uint32_t ModelLen,
-                  Span<const std::pair<std::string, uint32_t>> InputNames,
-                  std::vector<TF_Tensor *> &InTensor,
-                  Span<const std::pair<std::string, uint32_t>> OutputNames,
-                  std::vector<TF_Tensor *> &OutTensor) {
-  /// Tensorflow Status
-  TF_Status *Stat = TF_NewStatus();
-
-  /// Tensorflow Graph
-  TF_Graph *Graph = TF_NewGraph();
-  TF_Buffer *ModBuf = TF_NewBufferFromString(ModelBuf, ModelLen);
-  TF_ImportGraphDefOptions *GraphOpts = TF_NewImportGraphDefOptions();
-  TF_GraphImportGraphDef(Graph, ModBuf, GraphOpts, Stat);
-  if (TF_GetCode(Stat) != TF_OK) {
-    LOG(ERROR) << "Cannot import graph: " << TF_Message(Stat);
-    TF_DeleteImportGraphDefOptions(GraphOpts);
-    TF_DeleteGraph(Graph);
-    TF_DeleteBuffer(ModBuf);
-    TF_DeleteStatus(Stat);
-    return false;
+Expect<uint64_t>
+SSVMTensorflowCreateSession::body(Runtime::Instance::MemoryInstance *MemInst,
+                                  uint32_t ModBufPtr, uint32_t ModBufLen) {
+  /// Check memory instance from module.
+  if (MemInst == nullptr) {
+    return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Input and output tensor
-  std::vector<TF_Output> Inputs;
-  for (auto &S : InputNames) {
-    Inputs.emplace_back(
-        TF_Output{TF_GraphOperationByName(Graph, S.first.c_str()),
-                  static_cast<int>(S.second)});
-  }
-  std::vector<TF_Output> Outputs;
-  for (auto &S : OutputNames) {
-    Outputs.emplace_back(
-        TF_Output{TF_GraphOperationByName(Graph, S.first.c_str()),
-                  static_cast<int>(S.second)});
+  /// Create context and import graph.
+  struct SSVMTensorflowContext *Cxt = new SSVMTensorflowContext();
+  Cxt->Graph = TF_NewGraph();
+  Cxt->Buffer =
+      TF_NewBufferFromString(MemInst->getPointer<char *>(ModBufPtr), ModBufLen);
+  Cxt->GraphOpts = TF_NewImportGraphDefOptions();
+  TF_GraphImportGraphDef(Cxt->Graph, Cxt->Buffer, Cxt->GraphOpts, Cxt->Stat);
+  if (TF_GetCode(Cxt->Stat) != TF_OK) {
+    LOG(ERROR) << "ssvm_tensorflow_create_session: Cannot import graph: "
+               << TF_Message(Cxt->Stat);
+    delete Cxt;
+    return 0;
   }
 
-  /// Tensorflow Session
-  TF_SessionOptions *SessionOpts = TF_NewSessionOptions();
-  TF_Session *Session = TF_NewSession(Graph, SessionOpts, Stat);
-  if (TF_GetCode(Stat) != TF_OK) {
-    LOG(ERROR) << "Unable to create session: " << TF_Message(Stat);
-    TF_DeleteImportGraphDefOptions(GraphOpts);
-    TF_DeleteGraph(Graph);
-    TF_DeleteBuffer(ModBuf);
-    TF_DeleteSessionOptions(SessionOpts);
-    TF_DeleteStatus(Stat);
-    return false;
+  /// Create session.
+  Cxt->SessionOpts = TF_NewSessionOptions();
+  Cxt->Session = TF_NewSession(Cxt->Graph, Cxt->SessionOpts, Cxt->Stat);
+  if (TF_GetCode(Cxt->Stat) != TF_OK) {
+    LOG(ERROR) << "ssvm_tensorflow_create_session: Unable to create session: "
+               << TF_Message(Cxt->Stat);
+    delete Cxt;
+    return 0;
+  }
+  return static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(Cxt));
+}
+
+Expect<void>
+SSVMTensorflowDeleteSession::body(Runtime::Instance::MemoryInstance *MemInst,
+                                  uint64_t Cxt) {
+  /// Context struct
+  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  if (C != nullptr) {
+    delete C;
+  }
+  return {};
+}
+
+Expect<uint32_t>
+SSVMTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
+                               uint64_t Cxt) {
+  /// Context struct
+  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+
+  /// Delete old output tensors
+  for (auto T : C->OutputTensors) {
+    if (T) {
+      TF_DeleteTensor(T);
+    }
   }
 
   /// Run session
-  TF_SessionRun(Session,
+  TF_SessionRun(C->Session,
                 // RunOptions
                 nullptr,
                 // Input tensors
-                &Inputs[0], &InTensor[0], Inputs.size(),
+                &(C->Inputs[0]), &(C->InputTensors[0]), C->Inputs.size(),
                 // Output tensors
-                &Outputs[0], &OutTensor[0], Outputs.size(),
+                &(C->Outputs[0]), &(C->OutputTensors[0]), C->Outputs.size(),
                 // Target operations
                 nullptr, 0,
                 // RunMetadata
                 nullptr,
                 // Output status
-                Stat);
+                C->Stat);
 
-  /// Free resources
-  TF_CloseSession(Session, Stat);
-  TF_DeleteSession(Session, Stat);
-  TF_DeleteSessionOptions(SessionOpts);
-  TF_DeleteGraph(Graph);
-  TF_DeleteImportGraphDefOptions(GraphOpts);
-
-  if (TF_GetCode(Stat) != TF_OK) {
-    LOG(ERROR) << "Unable to run session: " << TF_Message(Stat);
-    TF_DeleteStatus(Stat);
-    return false;
-  }
-  TF_DeleteStatus(Stat);
-  return true;
-}
-
-} // namespace
-
-Expect<uint32_t>
-SSVMTensorflowExecModel::body(Runtime::Instance::MemoryInstance *MemInst,
-                              uint32_t ModBufPtr, uint32_t ModBufLen,
-                              uint32_t OutTensorPtr) {
-  /// Check memory instance from module.
-  if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
-  }
-
-  /// Output tensor
-  std::vector<TF_Tensor *> OutTensors(Env.Outputs.size(), nullptr);
-
-  /// Run session
-  if (!runTFSession(MemInst->getPointer<char *>(ModBufPtr), ModBufLen,
-                    Env.Inputs, Env.InputTensors, Env.Outputs, OutTensors)) {
+  if (TF_GetCode(C->Stat) != TF_OK) {
+    LOG(ERROR) << "ssvm_tensorflow_run_session: Unable to run session: "
+               << TF_Message(C->Stat);
     return 1;
   }
-
-  /// Store output tensors
-  std::copy_n(OutTensors.begin(), Env.Outputs.size(),
-              MemInst->getPointer<TF_Tensor **>(OutTensorPtr));
   return 0;
 }
 
 Expect<uint64_t>
-SSVMTensorflowAllocTensor::body(Runtime::Instance::MemoryInstance *MemInst,
-                                uint32_t DimPtr, uint32_t DimCnt,
-                                uint32_t DataType, uint32_t TensorBufPtr,
-                                uint32_t TensorBufLen) {
+SSVMTensorflowGetOutputTensor::body(Runtime::Instance::MemoryInstance *MemInst,
+                                    uint64_t Cxt, uint32_t OutputPtr,
+                                    uint32_t OutputLen, uint32_t Idx) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
+
+  /// Context struct
+  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+
+  /// Find the output tensor
+  std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
+  for (uint32_t I = 0; I < C->OutputNames.size(); ++I) {
+    if (Name == C->OutputNames[I].first && Idx == C->OutputNames[I].second) {
+      return static_cast<uint64_t>(
+          reinterpret_cast<std::uintptr_t>(C->OutputTensors[I]));
+    }
+  }
+  return 0;
+}
+
+Expect<uint32_t>
+SSVMTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
+                                 uint64_t Tensor) {
+  /// Return tensor data length.
+  TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
+  if (T != nullptr) {
+    return TF_TensorByteSize(T);
+  }
+  return 0;
+}
+
+Expect<void>
+SSVMTensorflowGetTensorData::body(Runtime::Instance::MemoryInstance *MemInst,
+                                  uint64_t Tensor, uint32_t BufPtr) {
+  /// Check memory instance from module.
+  if (MemInst == nullptr) {
+    return Unexpect(ErrCode::ExecutionFailed);
+  }
+
+  /// Copy tensor data to buffer.
+  TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
+  if (T != nullptr) {
+    uint8_t *Data = static_cast<uint8_t *>(TF_TensorData(T));
+    uint8_t *Buf = MemInst->getPointer<uint8_t *>(BufPtr);
+    if (TF_TensorByteSize(T) > 0) {
+      std::copy_n(Data, TF_TensorByteSize(T), Buf);
+    }
+  }
+  return {};
+}
+
+Expect<void> SSVMTensorflowAppendInput::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt, uint32_t InputPtr,
+    uint32_t InputLen, uint32_t Idx, uint32_t DimPtr, uint32_t DimCnt,
+    uint32_t DataType, uint32_t TensorBufPtr, uint32_t TensorBufLen) {
+  /// Check memory instance from module.
+  if (MemInst == nullptr) {
+    return Unexpect(ErrCode::ExecutionFailed);
+  }
+
+  /// Context struct
+  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
 
   /// Allocate tensor and data copying
   TF_Tensor *Tensor = nullptr;
@@ -143,82 +172,64 @@ SSVMTensorflowAllocTensor::body(Runtime::Instance::MemoryInstance *MemInst,
     std::copy_n(MemInst->getPointer<uint8_t *>(TensorBufPtr), TensorBufLen,
                 static_cast<uint8_t *>(TF_TensorData(Tensor)));
   }
-  return static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(Tensor));
-}
+  C->InputTensors.push_back(Tensor);
 
-Expect<void>
-SSVMTensorflowDeleteTensor::body(Runtime::Instance::MemoryInstance *MemInst,
-                                 uint64_t Tensor) {
-  TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
-  if (T != nullptr) {
-    TF_DeleteTensor(T);
-  }
-  return {};
-}
-
-Expect<uint32_t>
-SSVMTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
-                                 uint64_t Tensor) {
-  TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
-  if (T != nullptr) {
-    return TF_TensorByteSize(T);
-  }
-  return 0;
-}
-
-Expect<void>
-SSVMTensorflowGetTensorData::body(Runtime::Instance::MemoryInstance *MemInst,
-                                  uint64_t Tensor, uint32_t BufPtr) {
-  TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
-  if (T != nullptr) {
-    uint8_t *Data = static_cast<uint8_t *>(TF_TensorData(T));
-    uint8_t *Buf = MemInst->getPointer<uint8_t *>(BufPtr);
-    if (TF_TensorByteSize(T) > 0) {
-      std::copy_n(Data, TF_TensorByteSize(T), Buf);
-    }
-  }
-  return {};
-}
-
-Expect<void>
-SSVMTensorflowAppendInput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                uint32_t InputPtr, uint32_t InputLen,
-                                uint32_t Idx, uint64_t Tensor) {
-  /// Check memory instance from module.
-  if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
-  }
-
-  Env.Inputs.push_back(
-      {std::string(MemInst->getPointer<char *>(InputPtr), InputLen), Idx});
-  Env.InputTensors.push_back(reinterpret_cast<TF_Tensor *>(Tensor));
+  /// Store names and operations
+  std::string Name(MemInst->getPointer<char *>(InputPtr), InputLen);
+  C->InputNames.push_back({Name, Idx});
+  C->Inputs.emplace_back(TF_Output{
+      TF_GraphOperationByName(C->Graph, Name.c_str()), static_cast<int>(Idx)});
   return {};
 }
 
 Expect<void>
 SSVMTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                 uint32_t OutputPtr, uint32_t OutputLen,
-                                 uint32_t Idx) {
+                                 uint64_t Cxt, uint32_t OutputPtr,
+                                 uint32_t OutputLen, uint32_t Idx) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  Env.Outputs.push_back(
-      {std::string(MemInst->getPointer<char *>(OutputPtr), OutputLen), Idx});
+  /// Context struct
+  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
+  C->OutputTensors.push_back(nullptr);
+
+  /// Store names and operations
+  C->OutputNames.push_back({Name, Idx});
+  C->Outputs.emplace_back(TF_Output{
+      TF_GraphOperationByName(C->Graph, Name.c_str()), static_cast<int>(Idx)});
   return {};
 }
 
 Expect<void>
-SSVMTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst) {
-  Env.Inputs.clear();
-  Env.InputTensors.clear();
+SSVMTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst,
+                               uint64_t Cxt) {
+  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  C->Inputs.clear();
+  C->InputNames.clear();
+  for (auto T : C->InputTensors) {
+    if (T) {
+      TF_DeleteTensor(T);
+    }
+  }
+  C->InputTensors.clear();
   return {};
 }
 
 Expect<void>
-SSVMTensorflowClearOutput::body(Runtime::Instance::MemoryInstance *MemInst) {
-  Env.Outputs.clear();
+SSVMTensorflowClearOutput::body(Runtime::Instance::MemoryInstance *MemInst,
+                                uint64_t Cxt) {
+  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  C->Outputs.clear();
+  C->OutputNames.clear();
+  for (auto T : C->OutputTensors) {
+    if (T) {
+      TF_DeleteTensor(T);
+    }
+  }
+  C->OutputTensors.clear();
   return {};
 }
 
