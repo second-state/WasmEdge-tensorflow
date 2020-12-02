@@ -42,7 +42,7 @@ $ sudo apt install -y libjpeg-dev libpng-dev
 ## Get SSVM-Tensorflow Source Code
 
 ```bash
-$ git clone git@github.com:second-state/ssvm-tensorflow.git
+$ git clone --recursive git@github.com:second-state/ssvm-tensorflow.git
 $ cd ssvm-tensorflow
 $ git checkout master
 ```
