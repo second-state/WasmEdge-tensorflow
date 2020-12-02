@@ -36,30 +36,28 @@ bool readBufToImg(const char *Buf, uint32_t Len, Image &Img,
 
 /// Helper function to resize image. 8-bit depth only.
 template <typename Image>
-std::vector<uint8_t> resizeImg(const Image &Img, uint32_t W, uint32_t H) {
+void resizeImg(const Image &Img, uint32_t W, uint32_t H, uint8_t *DstBuf) {
   uint32_t C = boost::gil::num_channels<typename Image::view_t>::value;
-  std::vector<uint8_t> ImgData(C * W * H);
   typename Image::view_t ImgView = boost::gil::interleaved_view(
-      W, H, (typename Image::value_type *)(&ImgData[0]),
+      W, H, reinterpret_cast<typename Image::value_type *>(DstBuf),
       W * C * sizeof(uint8_t));
   boost::gil::resize_view(boost::gil::const_view(Img), ImgView,
                           boost::gil::bilinear_sampler());
-  return ImgData;
 }
 
-/// Helper function to normalize and resize image
-std::vector<float> normalizeImg(Span<const uint8_t> V) {
-  std::vector<float> Flat(V.size());
-  std::transform(V.begin(), V.end(), Flat.begin(),
-                 [](uint8_t P) -> float { return P / 255.0; });
-  return Flat;
+/// Helper function to normalize image.
+void normalizeImg(Span<const uint8_t> V, float *DstBuf) {
+  for (auto I = 0; I < V.size(); I++) {
+    *(DstBuf + I) = V[I] / 255.0;
+  }
 }
 } // namespace
 
 Expect<uint32_t>
 SSVMImageLoadJPGToRGB8::body(Runtime::Instance::MemoryInstance *MemInst,
                              uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                             uint32_t TargetImgW, uint32_t TargetImgH) {
+                             uint32_t TargetImgW, uint32_t TargetImgH,
+                             uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -70,14 +68,16 @@ SSVMImageLoadJPGToRGB8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
-  Env.Res = resizeImg(Img, TargetImgW, TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH,
+            MemInst->getPointer<uint8_t *>(DstBufPtr));
   return 0;
 }
 
 Expect<uint32_t>
 SSVMImageLoadJPGToBGR8::body(Runtime::Instance::MemoryInstance *MemInst,
                              uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                             uint32_t TargetImgW, uint32_t TargetImgH) {
+                             uint32_t TargetImgW, uint32_t TargetImgH,
+                             uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -88,14 +88,16 @@ SSVMImageLoadJPGToBGR8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
-  Env.Res = resizeImg(Img, TargetImgW, TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH,
+            MemInst->getPointer<uint8_t *>(DstBufPtr));
   return 0;
 }
 
 Expect<uint32_t>
 SSVMImageLoadJPGToRGB32F::body(Runtime::Instance::MemoryInstance *MemInst,
                                uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                               uint32_t TargetImgW, uint32_t TargetImgH) {
+                               uint32_t TargetImgW, uint32_t TargetImgH,
+                               uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -106,17 +108,17 @@ SSVMImageLoadJPGToRGB32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
-  auto Flat = normalizeImg(Resized);
-  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
-  Env.Res = std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size());
+  std::vector<uint8_t> ImgData(3 * TargetImgW * TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH, ImgData.data());
+  normalizeImg(ImgData, MemInst->getPointer<float *>(DstBufPtr));
   return 0;
 }
 
 Expect<uint32_t>
 SSVMImageLoadJPGToBGR32F::body(Runtime::Instance::MemoryInstance *MemInst,
                                uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                               uint32_t TargetImgW, uint32_t TargetImgH) {
+                               uint32_t TargetImgW, uint32_t TargetImgH,
+                               uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -127,17 +129,17 @@ SSVMImageLoadJPGToBGR32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::jpeg_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
-  auto Flat = normalizeImg(Resized);
-  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
-  Env.Res = std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size());
+  std::vector<uint8_t> ImgData(3 * TargetImgW * TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH, ImgData.data());
+  normalizeImg(ImgData, MemInst->getPointer<float *>(DstBufPtr));
   return 0;
 }
 
 Expect<uint32_t>
 SSVMImageLoadPNGToRGB8::body(Runtime::Instance::MemoryInstance *MemInst,
                              uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                             uint32_t TargetImgW, uint32_t TargetImgH) {
+                             uint32_t TargetImgW, uint32_t TargetImgH,
+                             uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -148,14 +150,16 @@ SSVMImageLoadPNGToRGB8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
-  Env.Res = resizeImg(Img, TargetImgW, TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH,
+            MemInst->getPointer<uint8_t *>(DstBufPtr));
   return 0;
 }
 
 Expect<uint32_t>
 SSVMImageLoadPNGToBGR8::body(Runtime::Instance::MemoryInstance *MemInst,
                              uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                             uint32_t TargetImgW, uint32_t TargetImgH) {
+                             uint32_t TargetImgW, uint32_t TargetImgH,
+                             uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -166,14 +170,16 @@ SSVMImageLoadPNGToBGR8::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
-  Env.Res = resizeImg(Img, TargetImgW, TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH,
+            MemInst->getPointer<uint8_t *>(DstBufPtr));
   return 0;
 }
 
 Expect<uint32_t>
 SSVMImageLoadPNGToRGB32F::body(Runtime::Instance::MemoryInstance *MemInst,
                                uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                               uint32_t TargetImgW, uint32_t TargetImgH) {
+                               uint32_t TargetImgW, uint32_t TargetImgH,
+                               uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -184,17 +190,17 @@ SSVMImageLoadPNGToRGB32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
-  auto Flat = normalizeImg(Resized);
-  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
-  Env.Res = std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size());
+  std::vector<uint8_t> ImgData(3 * TargetImgW * TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH, ImgData.data());
+  normalizeImg(ImgData, MemInst->getPointer<float *>(DstBufPtr));
   return 0;
 }
 
 Expect<uint32_t>
 SSVMImageLoadPNGToBGR32F::body(Runtime::Instance::MemoryInstance *MemInst,
                                uint32_t ImgBufPtr, uint32_t ImgBufLen,
-                               uint32_t TargetImgW, uint32_t TargetImgH) {
+                               uint32_t TargetImgW, uint32_t TargetImgH,
+                               uint32_t DstBufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -205,31 +211,10 @@ SSVMImageLoadPNGToBGR32F::body(Runtime::Instance::MemoryInstance *MemInst,
                     boost::gil::png_tag())) {
     return 1;
   }
-  auto Resized = resizeImg(Img, TargetImgW, TargetImgH);
-  auto Flat = normalizeImg(Resized);
-  uint8_t *Start = reinterpret_cast<uint8_t *>(&Flat[0]);
-  Env.Res = std::vector<uint8_t>(Start, Start + sizeof(float) * Flat.size());
+  std::vector<uint8_t> ImgData(3 * TargetImgW * TargetImgH);
+  resizeImg(Img, TargetImgW, TargetImgH, ImgData.data());
+  normalizeImg(ImgData, MemInst->getPointer<float *>(DstBufPtr));
   return 0;
-}
-
-Expect<uint32_t>
-SSVMImageGetResultLen::body(Runtime::Instance::MemoryInstance *MemInst) {
-  return Env.Res.size();
-}
-
-Expect<void>
-SSVMImageGetResult::body(Runtime::Instance::MemoryInstance *MemInst,
-                         uint32_t BufPtr) {
-  /// Check memory instance from module.
-  if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
-  }
-
-  uint8_t *Buf = MemInst->getPointer<uint8_t *>(BufPtr);
-  if (Env.Res.size() > 0) {
-    std::copy_n(Env.Res.begin(), Env.Res.size(), Buf);
-  }
-  return {};
 }
 
 } // namespace Host
