@@ -23,6 +23,42 @@ option(STATIC_BUILD "Link glibcxx library statically." OFF)
 find_package(Boost "1.68.0" REQUIRED)
 find_package(Filesystem REQUIRED Final Experimental)
 
+# Clone required shared libraries
+include(FetchContent)
+FetchContent_Declare(
+  ssvmtensorflowdeps
+  URL      https://github.com/second-state/ssvm-tensorflow-deps/releases/download/0.1.0/ssvm-tensorflow-deps-0.1.0-linux-x64.tar.gz
+  URL_HASH MD5=5d805f0454ab3f709985d5c6caa4f539
+)
+FetchContent_GetProperties(ssvmtensorflowdeps)
+if (NOT ssvmtensorflowdeps_POPULATED)
+  message(STATUS "Downloading dependencies")
+  FetchContent_Populate(ssvmtensorflowdeps)
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libjpeg.so.8.3.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so.8
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libjpeg.so.8 ${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libpng16.so.16.37.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libpng16.so.16
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libpng16.so.16 ${ssvmtensorflowdeps_SOURCE_DIR}/libpng16.so
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.so.2.4.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so.2
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.so.2 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.so.2.4.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so.2
+    COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.so.2 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so
+  )
+  message(STATUS "Downloading dependencies - done")
+endif ()
+set(SSVM_TENSORFLOW_DEPS_DIR ${ssvmtensorflowdeps_SOURCE_DIR})
+set(TENSORFLOW_LIB
+  "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflowlite_c.so"
+  "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so.2.4.0"
+  "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so.2.4.0"
+)
+set(JPEG_LIB
+  "${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so.8.3.0"
+)
+set(PNG_LIB
+  "${ssvmtensorflowdeps_SOURCE_DIR}/libpng16.so.16.37.0"
+)
+
 # Clone ssvm-core
 if(NOT SSVM_CORE_PATH)
   include(FetchContent)
@@ -34,7 +70,9 @@ if(NOT SSVM_CORE_PATH)
 
   FetchContent_GetProperties(ssvm)
   if (NOT ssvm_POPULATED)
-      FetchContent_Populate(ssvm)
+    message(STATUS "Fetching ssvm repository")
+    FetchContent_Populate(ssvm)
+    message(STATUS "Fetching ssvm repository - done")
   endif ()
   add_subdirectory(${ssvm_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
   set(SSVM_CORE_SRC_DIR ${ssvm_SOURCE_DIR})
