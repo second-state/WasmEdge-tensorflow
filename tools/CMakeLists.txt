@@ -25,3 +25,22 @@ target_link_libraries(ssvm-tensorflow
   dl
   pthread
 )
+
+target_link_options(ssvm-tensorflow
+  PUBLIC
+  "-static-libstdc++"
+)
+
+add_executable(show-tflite-tensor
+  show-tflite-tensor.cpp
+)
+
+target_link_libraries(show-tflite-tensor
+  PRIVATE
+  ${TENSORFLOW_LIB}
+)
+
+target_include_directories(show-tflite-tensor
+  PUBLIC
+  ${TENSORFLOW_INCLUDE}
+)

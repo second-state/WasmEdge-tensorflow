@@ -54,7 +54,6 @@ int main(int Argc, const char *Argv[]) {
   std::string InputPath = std::filesystem::absolute(SoName.value()).string();
   SSVM::VM::Configure Conf;
   Conf.addVMType(SSVM::VM::Configure::VMType::Wasi);
-  Conf.addVMType(SSVM::VM::Configure::VMType::SSVM_Process);
   SSVM::VM::VM VM(Conf);
   SSVM::Host::SSVMTensorflowModule TensorflowMod;
   SSVM::Host::SSVMTensorflowLiteModule TensorflowLiteMod;
