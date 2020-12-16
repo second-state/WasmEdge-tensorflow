@@ -34,9 +34,6 @@ $ sudo apt install -y \
 # You can choose one of them for building this project
 $ sudo apt install -y gcc g++
 $ sudo apt install -y clang
-
-# SSVM-Tensorflow requires the JPEG and PNG library
-$ sudo apt install -y libjpeg-dev libpng-dev
 ```
 
 ## Get SSVM-Tensorflow Source Code
@@ -44,7 +41,7 @@ $ sudo apt install -y libjpeg-dev libpng-dev
 ```bash
 $ git clone --recursive git@github.com:second-state/ssvm-tensorflow.git
 $ cd ssvm-tensorflow
-$ git checkout master
+$ git checkout 0.1.0
 ```
 
 ## Build SSVM-Tensorflow
@@ -63,19 +60,6 @@ $ docker run -it --rm \
 (docker)$ mkdir -p build && cd build
 ```
 
-### Install the required dependencies
-
-```bash
-# Install the JPEG and PNG library
-(docker)$ apt-get update && apt-get install -y libjpeg-dev libpng-dev
-# Install the tensorflow library
-(docker)$ wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-linux-x86_64-1.5.0.tar.gz
-(docker)$ tar -C /usr/local -xzf libtensorflow-cpu-linux-x86_64-1.5.0.tar.gz
-(docker)$ ldconfig
-```
-
-Please see the [Tensorflow Installation](https://www.tensorflow.org/install/lang_c) for detail.
-
 ### Option 1. Use built-in CMakeLists to get SSVM-Core (Recommended)
 
 ```bash
@@ -90,3 +74,12 @@ Please see the [Tensorflow Installation](https://www.tensorflow.org/install/lang
 
 The executable `build/tools/ssvmc-tensorflow` is the AOT compiler for WASM files.
 The executable `build/tools/ssvm-tensorflow` is the runner for executing WASM or compiled WASM.
+
+## Run SSVM-Tensorflow
+
+```bash
+wget https://github.com/second-state/ssvm-tensorflow/releases/download/0.1.0/ssvm-tensorflow-0.1.0-linux-x64.tar.gz
+tar -zxvf ssvm-tensorflow-0.1.0-linux-x64.tar.gz
+./download_dependencies  # Download the required shared libraries and make symbolic links.
+LD_LIBRARY_PATH=. ./ssvm-tensorflow 
+```
