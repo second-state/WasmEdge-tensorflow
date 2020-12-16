@@ -51,6 +51,12 @@ int main(int Argc, const char *Argv[]) {
     return 0;
   }
 
+  /// Disable debug info in TensorFlow.
+  char EnvTFLogLevel[] = "TF_CPP_MIN_LOG_LEVEL=3";
+  char EnvTFVLogLevel[] = "TF_CPP_MIN_VLOG_LEVEL=3";
+  putenv(EnvTFLogLevel);
+  putenv(EnvTFVLogLevel);
+
   std::string InputPath = std::filesystem::absolute(SoName.value()).string();
   SSVM::VM::Configure Conf;
   Conf.addVMType(SSVM::VM::Configure::VMType::Wasi);
