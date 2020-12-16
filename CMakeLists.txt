@@ -20,12 +20,7 @@ set(CMAKE_ENABLE_EXPORTS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 option(STATIC_BUILD "Link glibcxx library statically." OFF)
 
-SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
-find_package(TensorFlow REQUIRED)
 find_package(Boost "1.68.0" REQUIRED)
-find_package(ZLIB REQUIRED)
-find_package(JPEG REQUIRED)
-find_package(PNG REQUIRED)
 find_package(Filesystem REQUIRED Final Experimental)
 
 # Clone ssvm-core

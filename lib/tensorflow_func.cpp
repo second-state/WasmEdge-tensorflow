@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include <tensorflow/c/c_api.h>
+#include "tensorflow/c/c_api.h"
 
 #include "common/log.h"
 #include "common/span.h"

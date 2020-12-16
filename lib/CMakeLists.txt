@@ -8,12 +8,12 @@ add_library(ssvmHostModuleSSVMTensorflow
 target_link_libraries(ssvmHostModuleSSVMTensorflow
   PRIVATE
   ssvmCommon
-  ${TensorFlow_LIBRARIES}
+  ${TENSORFLOW_LIB}
 )
 
 target_include_directories(ssvmHostModuleSSVMTensorflow
   PUBLIC
-  ${TensorFlow_INCLUDE_DIR}
+  ${TENSORFLOW_INCLUDE}
   ${SSVM_CORE_SRC_DIR}/include
   ${SSVM_CORE_SRC_DIR}/thirdparty
 )
@@ -26,12 +26,12 @@ add_library(ssvmHostModuleSSVMTensorflowLite
 target_link_libraries(ssvmHostModuleSSVMTensorflowLite
   PRIVATE
   ssvmCommon
-  ${TENSORFLOW_LITE_LIB}
+  ${TENSORFLOW_LIB}
 )
 
 target_include_directories(ssvmHostModuleSSVMTensorflowLite
   PUBLIC
-  ${TENSORFLOW_LITE_INCLUDE}
+  ${TENSORFLOW_INCLUDE}
   ${SSVM_CORE_SRC_DIR}/include
   ${SSVM_CORE_SRC_DIR}/thirdparty
 )
@@ -44,12 +44,14 @@ add_library(ssvmHostModuleSSVMImage
 target_link_libraries(ssvmHostModuleSSVMImage
   PRIVATE
   ssvmCommon
-  ${JPEG_LIBRARIES}
-  ${PNG_LIBRARIES}
+  ${JPEG_LIB}
+  ${PNG_LIB}
 )
 
 target_include_directories(ssvmHostModuleSSVMImage
   PUBLIC
+  ${JPEG_INCLUDE}
+  ${PNG_INCLUDE}
   ${Boost_INCLUDE_DIR}
   ${SSVM_CORE_SRC_DIR}/include
   ${SSVM_CORE_SRC_DIR}/thirdparty

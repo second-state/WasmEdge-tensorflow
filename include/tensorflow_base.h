@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include <tensorflow/c/c_api.h>
+#include "tensorflow/c/c_api.h"
 
 #include "common/errcode.h"
 #include "runtime/hostfunc.h"

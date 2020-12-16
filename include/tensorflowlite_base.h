@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-#include "tflite/c_api.h"
+#include "tensorflow/lite/c/c_api.h"
 
 #include "common/errcode.h"
 #include "runtime/hostfunc.h"
