@@ -48,9 +48,11 @@ if (NOT ssvmtensorflowdeps_POPULATED)
 endif ()
 set(SSVM_TENSORFLOW_DEPS_DIR ${ssvmtensorflowdeps_SOURCE_DIR})
 set(TENSORFLOW_LIB
-  "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflowlite_c.so"
   "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so.2.4.0"
   "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so.2.4.0"
+)
+set(TENSORFLOW_LITE_LIB
+  "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflowlite_c.so"
 )
 set(JPEG_LIB
   "${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so.8.3.0"

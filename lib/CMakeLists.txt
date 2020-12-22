@@ -26,7 +26,7 @@ add_library(ssvmHostModuleSSVMTensorflowLite
 target_link_libraries(ssvmHostModuleSSVMTensorflowLite
   PRIVATE
   ssvmCommon
-  ${TENSORFLOW_LIB}
+  ${TENSORFLOW_LITE_LIB}
 )
 
 target_include_directories(ssvmHostModuleSSVMTensorflowLite

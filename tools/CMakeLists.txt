@@ -5,6 +5,11 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/download_dependencies.sh
   COPYONLY
 )
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/download_dependencies_lite.sh
+  ${CMAKE_CURRENT_BINARY_DIR}/download_dependencies_lite.sh
+  COPYONLY
+)
 message(STATUS "Copying shared library to directory ${CMAKE_CURRENT_BINARY_DIR}/libtensorflowlite_c.so")
 configure_file(
   ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflowlite_c.so
@@ -78,13 +83,32 @@ target_link_options(ssvm-tensorflow
   "-static-libstdc++"
 )
 
+add_executable(ssvm-tensorflow-lite
+  ssvmr-lite.cpp
+)
+
+target_link_libraries(ssvm-tensorflow-lite
+  PRIVATE
+  ssvmHostModuleSSVMTensorflowLite
+  ssvmHostModuleSSVMImage
+  ssvmVM
+  std::filesystem
+  dl
+  pthread
+)
+
+target_link_options(ssvm-tensorflow-lite
+  PUBLIC
+  "-static-libstdc++"
+)
+
 add_executable(show-tflite-tensor
   show-tflite-tensor.cpp
 )
 
 target_link_libraries(show-tflite-tensor
   PRIVATE
-  ${TENSORFLOW_LIB}
+  ${TENSORFLOW_LITE_LIB}
 )
 
 target_include_directories(show-tflite-tensor
