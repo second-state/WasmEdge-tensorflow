@@ -1,3 +1,12 @@
+### 0.1.1 (2020-12-22)
+
+This is a extension release for the `ssvm-tensorflow-lite` tool.
+
+Tools:
+
+* `ssvm-tensorflow-lite` is the SSVM runner for executing WASM or compiled WASM with only tensorflow-lite extensions.
+* `download_dependencies_lite.sh` is the script to download and extract the required shared libraries for only `ssvm-tensorflow-lite` tool.
+
 ### 0.1.0 (2020-12-17)
 
 Features:

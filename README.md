@@ -74,6 +74,7 @@ $ docker run -it --rm \
 
 The executable `build/tools/ssvmc-tensorflow` is the AOT compiler for WASM files.
 The executable `build/tools/ssvm-tensorflow` is the runner for executing WASM or compiled WASM.
+The executable `build/tools/ssvm-tensorflow-lite` is the runner for executing WASM or compiled WASM with only TensorFlow-lite host functions supported.
 
 ## Run SSVM-Tensorflow
 
