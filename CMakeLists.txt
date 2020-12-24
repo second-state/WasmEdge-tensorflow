@@ -19,6 +19,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_ENABLE_EXPORTS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 option(STATIC_BUILD "Link glibcxx library statically." OFF)
+option(BUILD_TOOLS "Generate ssvm and ssvmc tools." OFF)
 
 find_package(Boost "1.68.0" REQUIRED)
 find_package(Filesystem REQUIRED Final Experimental)
@@ -67,7 +68,7 @@ if(NOT SSVM_CORE_PATH)
   FetchContent_Declare(
     ssvm
     GIT_REPOSITORY https://github.com/second-state/SSVM.git
-    GIT_TAG 0.7.1
+    GIT_TAG 0.7.2
   )
 
   FetchContent_GetProperties(ssvm)

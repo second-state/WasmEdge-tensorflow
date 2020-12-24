@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "common/filesystem.h"
+#include "common/proposal.h"
 #include "common/value.h"
 #include "po/argument_parser.h"
 #include "vm/configure.h"
@@ -20,8 +21,8 @@ int main(int Argc, const char *Argv[]) {
   std::ios::sync_with_stdio(false);
   SSVM::Log::setErrorLoggingLevel();
 
-  PO::Option<std::string> SoName(PO::Description("Wasm so file"s),
-                                 PO::MetaVar("WASM_SO"s));
+  PO::Option<std::string> SoName(PO::Description("Wasm or so file"s),
+                                 PO::MetaVar("WASM_OR_SO"s));
   PO::List<std::string> Args(PO::Description("Execution arguments"s),
                              PO::MetaVar("ARG"s));
 
@@ -41,12 +42,23 @@ int main(int Argc, const char *Argv[]) {
           "Environ variables. Each variables can specified as --env `NAME=VALUE`."s),
       PO::MetaVar("ENVS"s));
 
+  PO::Option<PO::Toggle> BulkMemoryOperations(
+      PO::Description("Enable Bulk-memory operations"));
+  PO::Option<PO::Toggle> ReferenceTypes(
+      PO::Description("Enable Reference types (externref)"));
+  PO::Option<PO::Toggle> SIMD(PO::Description("Enable SIMD"));
+  PO::Option<PO::Toggle> All(PO::Description("Enable all features"));
+
   if (!PO::ArgumentParser()
            .add_option(SoName)
            .add_option(Args)
            .add_option("reactor", Reactor)
            .add_option("dir", Dir)
            .add_option("env", Env)
+           .add_option("enable-bulk-memory", BulkMemoryOperations)
+           .add_option("enable-reference-types", ReferenceTypes)
+           .add_option("enable-simd", SIMD)
+           .add_option("enable-all", All)
            .parse(Argc, Argv)) {
     return 0;
   }
@@ -57,10 +69,26 @@ int main(int Argc, const char *Argv[]) {
   putenv(EnvTFLogLevel);
   putenv(EnvTFVLogLevel);
 
-  std::string InputPath = std::filesystem::absolute(SoName.value()).string();
+  SSVM::ProposalConfigure ProposalConf;
+  if (BulkMemoryOperations.value()) {
+    ProposalConf.addProposal(SSVM::Proposal::BulkMemoryOperations);
+  }
+  if (ReferenceTypes.value()) {
+    ProposalConf.addProposal(SSVM::Proposal::ReferenceTypes);
+  }
+  if (SIMD.value()) {
+    ProposalConf.addProposal(SSVM::Proposal::SIMD);
+  }
+  if (All.value()) {
+    ProposalConf.addProposal(SSVM::Proposal::BulkMemoryOperations);
+    ProposalConf.addProposal(SSVM::Proposal::ReferenceTypes);
+    ProposalConf.addProposal(SSVM::Proposal::SIMD);
+  }
+
+  const auto InputPath = std::filesystem::absolute(SoName.value());
   SSVM::VM::Configure Conf;
   Conf.addVMType(SSVM::VM::Configure::VMType::Wasi);
-  SSVM::VM::VM VM(Conf);
+  SSVM::VM::VM VM(ProposalConf, Conf);
   SSVM::Host::SSVMTensorflowFakeModule TensorflowMod;
   SSVM::Host::SSVMTensorflowLiteModule TensorflowLiteMod;
   SSVM::Host::SSVMImageModule ImageMod;
@@ -71,12 +99,13 @@ int main(int Argc, const char *Argv[]) {
   SSVM::Host::WasiModule *WasiMod = dynamic_cast<SSVM::Host::WasiModule *>(
       VM.getImportModule(SSVM::VM::Configure::VMType::Wasi));
 
-  WasiMod->getEnv().init(Dir.value(), SoName.value(), Args.value(),
-                         Env.value());
+  WasiMod->getEnv().init(Dir.value(),
+                         InputPath.filename().replace_extension("wasm"sv),
+                         Args.value(), Env.value());
 
   if (!Reactor.value()) {
     // command mode
-    if (auto Result = VM.runWasmFile(InputPath, "_start")) {
+    if (auto Result = VM.runWasmFile(InputPath.u8string(), "_start")) {
       return WasiMod->getEnv().getExitCode();
     } else {
       return EXIT_FAILURE;
@@ -89,7 +118,7 @@ int main(int Argc, const char *Argv[]) {
       return EXIT_FAILURE;
     }
     const auto &FuncName = Args.value().front();
-    if (auto Result = VM.loadWasm(InputPath); !Result) {
+    if (auto Result = VM.loadWasm(InputPath.u8string()); !Result) {
       return EXIT_FAILURE;
     }
     if (auto Result = VM.validate(); !Result) {
