@@ -14,8 +14,8 @@ target_link_libraries(ssvmHostModuleSSVMTensorflow
 target_include_directories(ssvmHostModuleSSVMTensorflow
   PUBLIC
   ${TENSORFLOW_INCLUDE}
-  ${SSVM_CORE_SRC_DIR}/include
-  ${SSVM_CORE_SRC_DIR}/thirdparty
+  ${SSVM_CORE_PATH}/include
+  ${SSVM_CORE_PATH}/thirdparty
 )
 
 add_library(ssvmHostModuleSSVMTensorflowLite
@@ -32,6 +32,6 @@ target_link_libraries(ssvmHostModuleSSVMTensorflowLite
 target_include_directories(ssvmHostModuleSSVMTensorflowLite
   PUBLIC
   ${TENSORFLOW_INCLUDE}
-  ${SSVM_CORE_SRC_DIR}/include
-  ${SSVM_CORE_SRC_DIR}/thirdparty
+  ${SSVM_CORE_PATH}/include
+  ${SSVM_CORE_PATH}/thirdparty
 )

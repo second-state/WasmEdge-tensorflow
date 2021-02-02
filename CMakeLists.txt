@@ -18,8 +18,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_ENABLE_EXPORTS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-option(STATIC_BUILD "Link glibcxx library statically." OFF)
 option(BUILD_TOOLS "Generate ssvm and ssvmc tools." OFF)
+option(BUILD_TOOLS_SSVM_TENSORFLOW "Generate ssvm-tensorflow tools." ON)
 
 find_package(Boost "1.68.0" REQUIRED)
 find_package(Filesystem REQUIRED Final Experimental)
@@ -62,28 +62,79 @@ if(NOT SSVM_CORE_PATH)
   )
 
   FetchContent_GetProperties(ssvm)
-  if (NOT ssvm_POPULATED)
+  if(NOT ssvm_POPULATED)
     message(STATUS "Fetching ssvm repository")
     FetchContent_Populate(ssvm)
     message(STATUS "Fetching ssvm repository - done")
-  endif ()
+  endif()
   add_subdirectory(${ssvm_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
-  set(SSVM_CORE_SRC_DIR ${ssvm_SOURCE_DIR})
+  set(SSVM_CORE_PATH ${ssvm_SOURCE_DIR})
+  set(SSVM_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
 else()
   get_filename_component(
     SSVM_CORE_PATH "${SSVM_CORE_PATH}"
     REALPATH
     BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-  add_subdirectory(${SSVM_CORE_PATH} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
-  set(SSVM_CORE_SRC_DIR ${SSVM_CORE_PATH})
+  if(NOT SSVM_CORE_BIN_PATH)
+    add_subdirectory(${SSVM_CORE_PATH} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
+    set(SSVM_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
+  else()
+    get_filename_component(
+      SSVM_CORE_BIN_PATH "${SSVM_CORE_BIN_PATH}"
+      REALPATH
+      BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+  endif()
 endif()
 
-# TensorFlow lite static library
+# Clone ssvm-image
+if(NOT SSVM_IMAGE_PATH)
+  include(FetchContent)
+  FetchContent_Declare(
+    ssvm_image
+    GIT_REPOSITORY https://github.com/second-state/ssvm-image.git
+    GIT_TAG master
+  )
+
+  FetchContent_GetProperties(ssvm_image)
+  if(NOT ssvm_image_POPULATED)
+    message(STATUS "Fetching ssvm-image repository")
+    FetchContent_Populate(ssvm_image)
+    message(STATUS "Fetching ssvm-image repository - done")
+  endif()
+  add_subdirectory(${ssvm_image_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
+  set(SSVM_IMAGE_PATH ${ssvm_image_SOURCE_DIR})
+  set(SSVM_IMAGE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
+else()
+  get_filename_component(
+    SSVM_IMAGE_PATH "${SSVM_IMAGE_PATH}"
+    REALPATH
+    BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+  if(NOT SSVM_IMAGE_BIN_PATH)
+    add_subdirectory(${SSVM_IMAGE_PATH} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
+    set(SSVM_IMAGE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
+  else()
+    get_filename_component(
+      SSVM_IMAGE_BIN_PATH "${SSVM_IMAGE_BIN_PATH}"
+      REALPATH
+      BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+  endif()
+endif()
+
+message(STATUS "Set ssvm-core source path: ${SSVM_CORE_PATH}")
+message(STATUS "Set ssvm-core binary path: ${SSVM_CORE_BIN_PATH}")
+message(STATUS "Set ssvm-image source path: ${SSVM_IMAGE_PATH}")
+message(STATUS "Set ssvm-image binary path: ${SSVM_IMAGE_BIN_PATH}")
+
+# TensorFlow dependencies library
 add_subdirectory(utils/ssvm-tensorflow-deps)
 
 include_directories(BEFORE
   ${CMAKE_CURRENT_BINARY_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+include_directories(BEFORE
+  ${SSVM_IMAGE_BIN_PATH}/include
+  ${SSVM_IMAGE_PATH}/include
 )
 
 add_subdirectory(include)
