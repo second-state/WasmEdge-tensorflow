@@ -28,23 +28,7 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/libtensorflow_framework.so.2.4.0
   COPYONLY
 )
-message(STATUS "Copying shared library to directory ${CMAKE_CURRENT_BINARY_DIR}/libjpeg.so.8.3.0")
-configure_file(
-  ${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so.8.3.0
-  ${CMAKE_CURRENT_BINARY_DIR}/libjpeg.so.8.3.0
-  COPYONLY
-)
-message(STATUS "Copying shared library to directory ${CMAKE_CURRENT_BINARY_DIR}/libpng16.so.16.37.0")
-configure_file(
-  ${ssvmtensorflowdeps_SOURCE_DIR}/libpng16.so.16.37.0
-  ${CMAKE_CURRENT_BINARY_DIR}/libpng16.so.16.37.0
-  COPYONLY
-)
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -E create_symlink libjpeg.so.8.3.0 ${CMAKE_CURRENT_BINARY_DIR}/libjpeg.so.8
-  COMMAND ${CMAKE_COMMAND} -E create_symlink libjpeg.so.8 ${CMAKE_CURRENT_BINARY_DIR}/libjpeg.so
-  COMMAND ${CMAKE_COMMAND} -E create_symlink libpng16.so.16.37.0 ${CMAKE_CURRENT_BINARY_DIR}/libpng16.so.16
-  COMMAND ${CMAKE_COMMAND} -E create_symlink libpng16.so.16 ${CMAKE_CURRENT_BINARY_DIR}/libpng16.so
   COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.so.2.4.0 ${CMAKE_CURRENT_BINARY_DIR}/libtensorflow.so.2
   COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.so.2 ${CMAKE_CURRENT_BINARY_DIR}/libtensorflow.so
   COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.so.2.4.0 ${CMAKE_CURRENT_BINARY_DIR}/libtensorflow_framework.so.2
@@ -61,6 +45,12 @@ target_link_libraries(ssvmc-tensorflow
   ssvmValidator
   ssvmAOT
   std::filesystem
+)
+
+target_include_directories(ssvmc-tensorflow
+  PUBLIC
+  ${SSVM_CORE_PATH}/include
+  ${SSVM_CORE_PATH}/thirdparty
 )
 
 add_executable(ssvm-tensorflow

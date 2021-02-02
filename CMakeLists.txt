@@ -36,10 +36,6 @@ if (NOT ssvmtensorflowdeps_POPULATED)
   message(STATUS "Downloading dependencies")
   FetchContent_Populate(ssvmtensorflowdeps)
   execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink libjpeg.so.8.3.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so.8
-    COMMAND ${CMAKE_COMMAND} -E create_symlink libjpeg.so.8 ${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so
-    COMMAND ${CMAKE_COMMAND} -E create_symlink libpng16.so.16.37.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libpng16.so.16
-    COMMAND ${CMAKE_COMMAND} -E create_symlink libpng16.so.16 ${ssvmtensorflowdeps_SOURCE_DIR}/libpng16.so
     COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.so.2.4.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so.2
     COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.so.2 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so
     COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.so.2.4.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so.2
@@ -54,12 +50,6 @@ set(TENSORFLOW_LIB
 )
 set(TENSORFLOW_LITE_LIB
   "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflowlite_c.so"
-)
-set(JPEG_LIB
-  "${ssvmtensorflowdeps_SOURCE_DIR}/libjpeg.so.8.3.0"
-)
-set(PNG_LIB
-  "${ssvmtensorflowdeps_SOURCE_DIR}/libpng16.so.16.37.0"
 )
 
 # Clone ssvm-core
