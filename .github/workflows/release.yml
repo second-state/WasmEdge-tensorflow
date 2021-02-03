@@ -1,0 +1,81 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  create:
+    name: Create Release
+    runs-on: ssvm
+    container:
+      image: secondstate/ssvm:ubuntu-build-gcc
+    outputs:
+      version: ${{ steps.prep.outputs.version }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get version
+        id: prep
+        run: |
+          echo ::set-output name=version::$(git describe --tag)
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: SSVM-TensorFlow ${{ steps.prep.outputs.version }}
+          body_path: .CurrentChangelog.md
+          draft: false
+          prerelease: false
+  build_manylinux2014_x86_64:
+    name: Build SSVM-TensorFlow on manylinux2014_x86_64 platform
+    needs: [create]
+    runs-on: ssvm
+    container:
+      image: secondstate/ssvm:manylinux2014_x86_64
+    steps:
+      - name: Build manylinux2014_x86_64 package
+        run: |
+          curl -s -L -O --remote-name-all https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
+          bzip2 -dc boost_1_75_0.tar.bz2 | tar -xf -
+          yum check-update
+          yum install -y rpm-build
+          export PATH="/toolchain/bin:$PATH"
+          export CC=gcc
+          export CXX=g++
+          rm -rf build
+          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOL_SSVM_STATIC=Off -DBOOST_INCLUDEDIR=./boost_1_75_0/ .
+          cmake --build build
+          cd build/tools
+          tar -zcvf ssvm-tf.tar.gz show-tflite-tensor ssvm-tensorflow ssvm-tensorflow-lite ssvmc-tensorflow download_dependencies_all.sh download_dependencies_tf.sh download_dependencies_tflite.sh
+          tar Jcvf ssvm-tf.tar.xz show-tflite-tensor ssvm-tensorflow ssvm-tensorflow-lite ssvmc-tensorflow download_dependencies_all.sh download_dependencies_tf.sh download_dependencies_tflite.sh
+  upload_manylinux2014_x86_64_package:
+    name: Upload SSVM-TensorFlow manylinux2014 x86_64 package
+    needs: [create, build_manylinux2014_x86_64]
+    runs-on: ssvm
+    container:
+      image: secondstate/ssvm:ubuntu-build-gcc
+    steps:
+      - name: Upload manylinux2014_x86_64 tar.gz package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create.outputs.upload_url }}
+          asset_path: build/tools/ssvm-tf.tar.gz
+          asset_name: ssvm-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.gz
+          asset_content_type: application/x-gzip
+      - name: Upload manylinux2014_x86_64 tar.xz package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create.outputs.upload_url }}
+          asset_path: build/tools/ssvm-tf.tar.xz
+          asset_name: ssvm-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
+          asset_content_type: application/x-xz
