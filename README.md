@@ -41,7 +41,7 @@ $ sudo apt install -y clang
 ```bash
 $ git clone --recursive git@github.com:second-state/ssvm-tensorflow.git
 $ cd ssvm-tensorflow
-$ git checkout 0.1.0
+$ git checkout 0.7.3
 ```
 
 ## Build SSVM-Tensorflow
@@ -79,8 +79,12 @@ The executable `build/tools/ssvm-tensorflow-lite` is the runner for executing WA
 ## Run SSVM-Tensorflow
 
 ```bash
-wget https://github.com/second-state/ssvm-tensorflow/releases/download/0.1.0/ssvm-tensorflow-0.1.0-linux-x64.tar.gz
-tar -zxvf ssvm-tensorflow-0.1.0-linux-x64.tar.gz
-./download_dependencies  # Download the required shared libraries and make symbolic links.
-LD_LIBRARY_PATH=. ./ssvm-tensorflow 
+wget https://github.com/second-state/ssvm-tensorflow/releases/download/0.7.3/ssvm-tensorflow-0.7.3-manylinux2014_x86_64.tar.gz
+tar -zxvf ssvm-tensorflow-0.7.3-manylinux2014_x86_64.tar.gz
+# Download the required shared libraries and make symbolic links.
+./download_dependencies_all.sh
+LD_LIBRARY_PATH=. ./ssvm-tensorflow
+# For developers want to use TensorFlow-Lite only
+./download_dependencies_tflite.sh
+LD_LIBRARY_PATH=. ./ssvm-tensorflow-lite
 ```

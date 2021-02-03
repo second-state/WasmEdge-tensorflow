@@ -1,18 +1,23 @@
 # SPDX-License-Identifier: Apache-2.0
 
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/download_dependencies.sh
-  ${CMAKE_CURRENT_BINARY_DIR}/download_dependencies.sh
+  ${CMAKE_CURRENT_SOURCE_DIR}/download_dependencies_all.sh
+  ${CMAKE_CURRENT_BINARY_DIR}/download_dependencies_all.sh
   COPYONLY
 )
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/download_dependencies_lite.sh
-  ${CMAKE_CURRENT_BINARY_DIR}/download_dependencies_lite.sh
+  ${CMAKE_CURRENT_SOURCE_DIR}/download_dependencies_tf.sh
+  ${CMAKE_CURRENT_BINARY_DIR}/download_dependencies_tf.sh
+  COPYONLY
+)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/download_dependencies_tflite.sh
+  ${CMAKE_CURRENT_BINARY_DIR}/download_dependencies_tflite.sh
   COPYONLY
 )
 message(STATUS "Copying shared library to directory ${CMAKE_CURRENT_BINARY_DIR}/libtensorflowlite_c.so")
 configure_file(
-  ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflowlite_c.so
+  ${ssvmtensorflowdepslite_SOURCE_DIR}/libtensorflowlite_c.so
   ${CMAKE_CURRENT_BINARY_DIR}/libtensorflowlite_c.so
   COPYONLY
 )

@@ -28,12 +28,12 @@ find_package(Filesystem REQUIRED Final Experimental)
 include(FetchContent)
 FetchContent_Declare(
   ssvmtensorflowdeps
-  URL      https://github.com/second-state/ssvm-tensorflow-deps/releases/download/0.1.0/ssvm-tensorflow-deps-0.1.0-linux-x64.tar.gz
-  URL_HASH MD5=5d805f0454ab3f709985d5c6caa4f539
+  URL      https://github.com/second-state/ssvm-tensorflow-deps/releases/download/0.7.3/ssvm-tensorflow-deps-TF-0.7.3-manylinux2014_x86_64.tar.gz
+  URL_HASH MD5=a5a98e7efd60ffaf4309636015c85b85
 )
 FetchContent_GetProperties(ssvmtensorflowdeps)
 if (NOT ssvmtensorflowdeps_POPULATED)
-  message(STATUS "Downloading dependencies")
+  message(STATUS "Downloading dependency: libtensorflow")
   FetchContent_Populate(ssvmtensorflowdeps)
   execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.so.2.4.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so.2
@@ -41,15 +41,26 @@ if (NOT ssvmtensorflowdeps_POPULATED)
     COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.so.2.4.0 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so.2
     COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.so.2 ${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so
   )
-  message(STATUS "Downloading dependencies - done")
+  message(STATUS "Downloading dependency: libtensorflow - done")
 endif ()
-set(SSVM_TENSORFLOW_DEPS_DIR ${ssvmtensorflowdeps_SOURCE_DIR})
+FetchContent_Declare(
+  ssvmtensorflowdepslite
+  URL      https://github.com/second-state/ssvm-tensorflow-deps/releases/download/0.7.3/ssvm-tensorflow-deps-TFLite-0.7.3-manylinux2014_x86_64.tar.gz
+  URL_HASH MD5=365cb588e15b7db4ba8441cd1d84a6bf
+)
+FetchContent_GetProperties(ssvmtensorflowdepslite)
+if (NOT ssvmtensorflowdepslite_POPULATED)
+  message(STATUS "Downloading dependency: libtensorflowlite")
+  FetchContent_Populate(ssvmtensorflowdepslite)
+  message(STATUS "Downloading dependency: libtensorflowlite - done")
+endif ()
+
 set(TENSORFLOW_LIB
   "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow.so.2.4.0"
   "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflow_framework.so.2.4.0"
 )
 set(TENSORFLOW_LITE_LIB
-  "${ssvmtensorflowdeps_SOURCE_DIR}/libtensorflowlite_c.so"
+  "${ssvmtensorflowdepslite_SOURCE_DIR}/libtensorflowlite_c.so"
 )
 
 # Clone ssvm-core
@@ -58,7 +69,7 @@ if(NOT SSVM_CORE_PATH)
   FetchContent_Declare(
     ssvm
     GIT_REPOSITORY https://github.com/second-state/SSVM.git
-    GIT_TAG 0.7.2
+    GIT_TAG 0.7.3
   )
 
   FetchContent_GetProperties(ssvm)

@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
+#include "common/config.h"
 #include "common/filesystem.h"
 #include "common/proposal.h"
 #include "common/value.h"
+#include "host/ssvm_process/processmodule.h"
+#include "host/wasi/wasimodule.h"
 #include "po/argument_parser.h"
 #include "vm/configure.h"
 #include "vm/vm.h"
 
-#include "host/wasi/wasimodule.h"
 #include "image_module.h"
 #include "tensorflowfake_module.h"
 #include "tensorflowlite_module.h"
@@ -21,10 +23,10 @@ int main(int Argc, const char *Argv[]) {
   std::ios::sync_with_stdio(false);
   SSVM::Log::setErrorLoggingLevel();
 
-  PO::Option<std::string> SoName(PO::Description("Wasm or so file"s),
-                                 PO::MetaVar("WASM_OR_SO"s));
-  PO::List<std::string> Args(PO::Description("Execution arguments"s),
-                             PO::MetaVar("ARG"s));
+  PO::Option<std::string> SoName(PO::Description("Wasm or so file"sv),
+                                 PO::MetaVar("WASM_OR_SO"sv));
+  PO::List<std::string> Args(PO::Description("Execution arguments"sv),
+                             PO::MetaVar("ARG"sv));
 
   PO::Option<PO::Toggle> Reactor(PO::Description(
       "Enable reactor mode. Reactor mode calls `_initialize` if exported."));
@@ -34,33 +36,46 @@ int main(int Argc, const char *Argv[]) {
           "Binding directories into WASI virtual filesystem. Each directories "
           "can specified as --dir `host_path:guest_path`, where `guest_path` "
           "specifies the path that will correspond to `host_path` for calls "
-          "like `fopen` in the guest."s),
-      PO::MetaVar("PREOPEN_DIRS"s));
+          "like `fopen` in the guest."sv),
+      PO::MetaVar("PREOPEN_DIRS"sv));
 
   PO::List<std::string> Env(
       PO::Description(
-          "Environ variables. Each variables can specified as --env `NAME=VALUE`."s),
-      PO::MetaVar("ENVS"s));
+          "Environ variables. Each variable can be specified as --env `NAME=VALUE`."sv),
+      PO::MetaVar("ENVS"sv));
 
   PO::Option<PO::Toggle> BulkMemoryOperations(
-      PO::Description("Enable Bulk-memory operations"));
+      PO::Description("Enable Bulk-memory operations"sv));
   PO::Option<PO::Toggle> ReferenceTypes(
-      PO::Description("Enable Reference types (externref)"));
-  PO::Option<PO::Toggle> SIMD(PO::Description("Enable SIMD"));
-  PO::Option<PO::Toggle> All(PO::Description("Enable all features"));
+      PO::Description("Enable Reference types (externref)"sv));
+  PO::Option<PO::Toggle> SIMD(PO::Description("Enable SIMD"sv));
+  PO::Option<PO::Toggle> All(PO::Description("Enable all features"sv));
 
-  if (!PO::ArgumentParser()
-           .add_option(SoName)
+  PO::List<std::string> AllowCmd(
+      PO::Description(
+          "Allow commands called from ssvm_process host functions. Each command can be specified as --allow-command `COMMAND`."sv),
+      PO::MetaVar("COMMANDS"sv));
+  PO::Option<PO::Toggle> AllowCmdAll(PO::Description(
+      "Allow all commands called from ssvm_process host functions."sv));
+
+  auto Parser = PO::ArgumentParser();
+  if (!Parser.add_option(SoName)
            .add_option(Args)
-           .add_option("reactor", Reactor)
-           .add_option("dir", Dir)
-           .add_option("env", Env)
-           .add_option("enable-bulk-memory", BulkMemoryOperations)
-           .add_option("enable-reference-types", ReferenceTypes)
-           .add_option("enable-simd", SIMD)
-           .add_option("enable-all", All)
+           .add_option("reactor"sv, Reactor)
+           .add_option("dir"sv, Dir)
+           .add_option("env"sv, Env)
+           .add_option("enable-bulk-memory"sv, BulkMemoryOperations)
+           .add_option("enable-reference-types"sv, ReferenceTypes)
+           .add_option("enable-simd"sv, SIMD)
+           .add_option("enable-all"sv, All)
+           .add_option("allow-command"sv, AllowCmd)
+           .add_option("allow-command-all"sv, AllowCmdAll)
            .parse(Argc, Argv)) {
-    return 0;
+    return EXIT_FAILURE;
+  }
+  if (Parser.isVersion()) {
+    std::cout << Argv[0] << " version "sv << SSVM::kVersionString << '\n';
+    return EXIT_SUCCESS;
   }
 
   /// Disable debug info in TensorFlow.
@@ -88,6 +103,7 @@ int main(int Argc, const char *Argv[]) {
   const auto InputPath = std::filesystem::absolute(SoName.value());
   SSVM::VM::Configure Conf;
   Conf.addVMType(SSVM::VM::Configure::VMType::Wasi);
+  Conf.addVMType(SSVM::VM::Configure::VMType::SSVM_Process);
   SSVM::VM::VM VM(ProposalConf, Conf);
   SSVM::Host::SSVMTensorflowFakeModule TensorflowMod;
   SSVM::Host::SSVMTensorflowLiteModule TensorflowLiteMod;
@@ -98,6 +114,16 @@ int main(int Argc, const char *Argv[]) {
 
   SSVM::Host::WasiModule *WasiMod = dynamic_cast<SSVM::Host::WasiModule *>(
       VM.getImportModule(SSVM::VM::Configure::VMType::Wasi));
+  SSVM::Host::SSVMProcessModule *ProcMod =
+      dynamic_cast<SSVM::Host::SSVMProcessModule *>(
+          VM.getImportModule(SSVM::VM::Configure::VMType::SSVM_Process));
+
+  if (AllowCmdAll.value()) {
+    ProcMod->getEnv().AllowedAll = true;
+  }
+  for (auto &Str : AllowCmd.value()) {
+    ProcMod->getEnv().AllowedCmd.insert(Str);
+  }
 
   WasiMod->getEnv().init(Dir.value(),
                          InputPath.filename().replace_extension("wasm"sv),
