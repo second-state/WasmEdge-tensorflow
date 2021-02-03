@@ -2,6 +2,8 @@
 
 cmake_minimum_required(VERSION 3.11)
 project(SSVM-Tensorflow)
+unset(SSVM_CORE_CONFIGURED)
+unset(SSVM_IMAGE_CONFIGURED)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -81,6 +83,7 @@ if(NOT SSVM_CORE_PATH)
   add_subdirectory(${ssvm_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
   set(SSVM_CORE_PATH ${ssvm_SOURCE_DIR})
   set(SSVM_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
+  set(SSVM_CORE_CONFIGURED ON)
 else()
   get_filename_component(
     SSVM_CORE_PATH "${SSVM_CORE_PATH}"
@@ -89,6 +92,7 @@ else()
   if(NOT SSVM_CORE_BIN_PATH)
     add_subdirectory(${SSVM_CORE_PATH} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
     set(SSVM_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
+    set(SSVM_CORE_CONFIGURED ON)
   else()
     get_filename_component(
       SSVM_CORE_BIN_PATH "${SSVM_CORE_BIN_PATH}"
@@ -103,7 +107,7 @@ if(NOT SSVM_IMAGE_PATH)
   FetchContent_Declare(
     ssvm_image
     GIT_REPOSITORY https://github.com/second-state/ssvm-image.git
-    GIT_TAG master
+    GIT_TAG 0.7.3
   )
 
   FetchContent_GetProperties(ssvm_image)
@@ -115,6 +119,7 @@ if(NOT SSVM_IMAGE_PATH)
   add_subdirectory(${ssvm_image_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
   set(SSVM_IMAGE_PATH ${ssvm_image_SOURCE_DIR})
   set(SSVM_IMAGE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
+  set(SSVM_IMAGE_CONFIGURED ON)
 else()
   get_filename_component(
     SSVM_IMAGE_PATH "${SSVM_IMAGE_PATH}"
@@ -123,6 +128,7 @@ else()
   if(NOT SSVM_IMAGE_BIN_PATH)
     add_subdirectory(${SSVM_IMAGE_PATH} ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
     set(SSVM_IMAGE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-image)
+    set(SSVM_IMAGE_CONFIGURED ON)
   else()
     get_filename_component(
       SSVM_IMAGE_BIN_PATH "${SSVM_IMAGE_BIN_PATH}"
@@ -138,6 +144,14 @@ message(STATUS "Set ssvm-image binary path: ${SSVM_IMAGE_BIN_PATH}")
 
 # TensorFlow dependencies library
 add_subdirectory(utils/ssvm-tensorflow-deps)
+if(NOT SSVM_CORE_CONFIGURED)
+  add_subdirectory(${SSVM_CORE_PATH} ${SSVM_CORE_BIN_PATH})
+  set(SSVM_CORE_CONFIGURED)
+endif()
+if(NOT SSVM_IMAGE_CONFIGURED)
+  add_subdirectory(${SSVM_IMAGE_PATH} ${SSVM_IMAGE_BIN_PATH})
+  set(SSVM_IMAGE_CONFIGURED)
+endif()
 
 include_directories(BEFORE
   ${CMAKE_CURRENT_BINARY_DIR}/include

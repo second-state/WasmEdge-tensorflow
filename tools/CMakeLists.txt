@@ -52,12 +52,6 @@ target_link_libraries(ssvmc-tensorflow
   std::filesystem
 )
 
-target_include_directories(ssvmc-tensorflow
-  PUBLIC
-  ${SSVM_CORE_PATH}/include
-  ${SSVM_CORE_PATH}/thirdparty
-)
-
 add_executable(ssvm-tensorflow
   ssvmr.cpp
 )
