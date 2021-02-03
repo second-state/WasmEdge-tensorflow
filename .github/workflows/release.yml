@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Get version
         id: prep
         run: |
@@ -43,7 +45,7 @@ jobs:
         run: |
           curl -s -L -O --remote-name-all https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
           bzip2 -dc boost_1_75_0.tar.bz2 | tar -xf -
-          yum check-update
+          yum check-update || true
           yum install -y rpm-build
           export PATH="/toolchain/bin:$PATH"
           export CC=gcc
@@ -54,6 +56,10 @@ jobs:
           cd build/tools
           tar -zcvf ssvm-tf.tar.gz show-tflite-tensor ssvm-tensorflow ssvm-tensorflow-lite ssvmc-tensorflow download_dependencies_all.sh download_dependencies_tf.sh download_dependencies_tflite.sh
           tar Jcvf ssvm-tf.tar.xz show-tflite-tensor ssvm-tensorflow ssvm-tensorflow-lite ssvmc-tensorflow download_dependencies_all.sh download_dependencies_tf.sh download_dependencies_tflite.sh
+          cd ../..
+          mv build/tools/ssvm-tf.tar.gz ssvm-tf.tar.gz
+          mv build/tools/ssvm-tf.tar.xz ssvm-tf.tar.xz
+          ls -alF
   upload_manylinux2014_x86_64_package:
     name: Upload SSVM-TensorFlow manylinux2014 x86_64 package
     needs: [create, build_manylinux2014_x86_64]
@@ -61,13 +67,16 @@ jobs:
     container:
       image: secondstate/ssvm:ubuntu-build-gcc
     steps:
+      - name: Check package
+        run: |
+          ls -alF
       - name: Upload manylinux2014_x86_64 tar.gz package
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create.outputs.upload_url }}
-          asset_path: build/tools/ssvm-tf.tar.gz
+          asset_path: ssvm-tf.tar.gz
           asset_name: ssvm-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.gz
           asset_content_type: application/x-gzip
       - name: Upload manylinux2014_x86_64 tar.xz package
@@ -76,6 +85,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create.outputs.upload_url }}
-          asset_path: build/tools/ssvm-tf.tar.xz
+          asset_path: ssvm-tf.tar.xz
           asset_name: ssvm-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
           asset_content_type: application/x-xz
