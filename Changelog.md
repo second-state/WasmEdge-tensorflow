@@ -1,3 +1,19 @@
+### 0.7.3 (2021-02-03)
+
+This is a extension release for updating `ssvm-core`.
+
+Features:
+
+* Update `ssvm-core` to version 0.7.3.
+  * Please refer to the [SSVM 0.7.3](https://github.com/second-state/SSVM/releases/tag/0.7.3) for more details.
+
+Tools:
+
+* `download_dependencies_tf.sh` is the script to download and extract the required shared libraries of `libtensorflow` and `libtensorflow_framework`.
+* `download_dependencies_tflite.sh` is the script to download and extract the required shared libraries for only `ssvm-tensorflow-lite` tool.
+* `download_dependencies_all.sh` is the script to download and extract all the required shared libraries.
+
+
 ### 0.7.2 (2020-12-24)
 
 This is a extension release for updating `ssvm-core`.
