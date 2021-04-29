@@ -8,7 +8,7 @@ on:
 jobs:
   create:
     name: Create Release
-    runs-on: ssvm
+    runs-on: ubuntu-latest
     container:
       image: secondstate/ssvm:ubuntu-build-gcc
     outputs:
@@ -34,13 +34,17 @@ jobs:
           body_path: .CurrentChangelog.md
           draft: false
           prerelease: false
-  build_manylinux2014_x86_64:
+  build_and_upload_manylinux2014_x86_64:
     name: Build SSVM-TensorFlow on manylinux2014_x86_64 platform
     needs: [create]
-    runs-on: ssvm
+    runs-on: ubuntu-latest
     container:
       image: secondstate/ssvm:manylinux2014_x86_64
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Build manylinux2014_x86_64 package
         run: |
           curl -s -L -O --remote-name-all https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
@@ -59,16 +63,6 @@ jobs:
           cd ../..
           mv build/tools/ssvm-tf.tar.gz ssvm-tf.tar.gz
           mv build/tools/ssvm-tf.tar.xz ssvm-tf.tar.xz
-          ls -alF
-  upload_manylinux2014_x86_64_package:
-    name: Upload SSVM-TensorFlow manylinux2014 x86_64 package
-    needs: [create, build_manylinux2014_x86_64]
-    runs-on: ssvm
-    container:
-      image: secondstate/ssvm:ubuntu-build-gcc
-    steps:
-      - name: Check package
-        run: |
           ls -alF
       - name: Upload manylinux2014_x86_64 tar.gz package
         uses: actions/upload-release-asset@v1
