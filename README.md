@@ -4,6 +4,29 @@ The [Second State VM (SSVM)](https://github.com/second-state/ssvm) is a high per
 
 # Getting Started
 
+## Requirements
+
+The SSVM Tensorflow shared library `libssvm-tensorflow_c.so` and `libssvm-tensorflowlite_c.so` are provided for the SSVM-Tensorflow extension of the SSVM shared library.
+The SSVM Tensorflow static library `libssvmHostModuleSSVMTensorflow.a` and `libssvmHostModuleSSVMTensorflowLite.a` are provided for statical linking when building executables with CMake.
+When linking with `libssvm-tensorflow_c.so` and `libssvmHostModuleSSVMTensorflow.a`, the TensorFlow shared libraries `libtensorflow.so` and `libtensorflow_framework.so` are required.
+When linking with `libssvm-tensorflowlite_c.so` and `libssvmHostModuleSSVMTensorflowLite.a`, the TensorFlow-Lite shared library `libtensorflowlite_c.so` is required.
+
+The official TensorFlow release only provide the TensorFlow shared library.
+You can download and install the pre-built shared libraries:
+
+```bash
+$ wget https://github.com/second-state/ssvm-tensorflow-deps/releases/download/0.7.3/ssvm-tensorflow-deps-TF-0.7.3-manylinux2014_x86_64.tar.gz
+$ tar -zxvf ssvm-tensorflow-deps-TF-0.7.3-manylinux2014_x86_64.tar.gz
+$ rm -f ssvm-tensorflow-deps-TF-0.7.3-manylinux2014_x86_64.tar.gz
+$ ln -sf libtensorflow.so.2.4.0 libtensorflow.so.2
+$ ln -sf libtensorflow.so.2 libtensorflow.so
+$ ln -sf libtensorflow_framework.so.2.4.0 libtensorflow_framework.so.2
+$ ln -sf libtensorflow_framework.so.2 libtensorflow_framework.so
+$ wget https://github.com/second-state/ssvm-tensorflow-deps/releases/download/0.7.3/ssvm-tensorflow-deps-TFLite-0.7.3-manylinux2014_x86_64.tar.gz
+$ tar -zxvf ssvm-tensorflow-deps-TFLite-0.7.3-manylinux2014_x86_64.tar.gz
+$ rm -f ssvm-tensorflow-deps-TFLite-0.7.3-manylinux2014_x86_64.tar.gz
+```
+
 ## Prepare the environment
 
 ### Use our docker image (Recommanded)
@@ -25,11 +48,6 @@ $ sudo apt install -y \
 	cmake \
 	libboost-all-dev
 
-# And you will need to install llvm for ssvm-aot tools
-$ sudo apt install -y \
-	llvm-dev \
-	liblld-10-dev
-
 # SSVM supports both clang++ and g++ compilers
 # You can choose one of them for building this project
 $ sudo apt install -y gcc g++
@@ -41,7 +59,7 @@ $ sudo apt install -y clang
 ```bash
 $ git clone --recursive git@github.com:second-state/ssvm-tensorflow.git
 $ cd ssvm-tensorflow
-$ git checkout 0.7.3
+$ git checkout 0.8.0-rc1
 ```
 
 ## Build SSVM-Tensorflow
@@ -72,19 +90,13 @@ $ docker run -it --rm \
 (docker)$ cmake -DSSVM_CORE_PATH=<path/to/ssvm/source> -DCMAKE_BUILD_TYPE=Release .. && make
 ```
 
-The executable `build/tools/ssvmc-tensorflow` is the AOT compiler for WASM files.
-The executable `build/tools/ssvm-tensorflow` is the runner for executing WASM or compiled WASM.
-The executable `build/tools/ssvm-tensorflow-lite` is the runner for executing WASM or compiled WASM with only TensorFlow-lite host functions supported.
+The shared library `build/lib/libssvm-tensorflow_c.so` is the C API to create `ssvm-tensorflow` import object.
+The header `build/include/ssvm-tensorflow.h` is the header of the `libssvm-tensorflow_c.so` shared library.
+The shared library `build/lib/libssvm-tensorflowlite_c.so` is the C API to create `ssvm-tensorflowlite` import object.
+The header `build/include/ssvm-tensorflowlite.h` is the header of the `libssvm-tensorflowlite_c.so` shared library.
+The static library `build/lib/libssvmHostModuleSSVMTensorflow.a` is for executables linking in CMake.
+The static library `build/lib/libssvmHostModuleSSVMTensorflowLite.a` is for executables linking in CMake.
 
-## Run SSVM-Tensorflow
+# SSVM-Tensorflow Tools
 
-```bash
-wget https://github.com/second-state/ssvm-tensorflow/releases/download/0.7.3/ssvm-tensorflow-0.7.3-manylinux2014_x86_64.tar.gz
-tar -zxvf ssvm-tensorflow-0.7.3-manylinux2014_x86_64.tar.gz
-# Download the required shared libraries and make symbolic links.
-./download_dependencies_all.sh
-LD_LIBRARY_PATH=. ./ssvm-tensorflow
-# For developers want to use TensorFlow-Lite only
-./download_dependencies_tflite.sh
-LD_LIBRARY_PATH=. ./ssvm-tensorflow-lite
-```
+The tools is moved to the new [repository](https://github.com/second-state/ssvm-tensorflow-tools).
