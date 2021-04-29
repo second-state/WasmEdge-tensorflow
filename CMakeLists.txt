@@ -22,7 +22,6 @@ option(BUILD_TOOLS "Generate ssvm and ssvmc tools." OFF)
 option(BUILD_TOOLS_SSVM_TENSORFLOW "Generate ssvm-tensorflow tools." ON)
 
 find_package(Boost "1.68.0" REQUIRED)
-find_package(Filesystem REQUIRED Final Experimental)
 
 # Clone ssvm-core
 if(NOT SSVM_CORE_PATH)
