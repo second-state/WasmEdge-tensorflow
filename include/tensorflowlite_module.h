@@ -3,14 +3,14 @@
 
 #include "runtime/importobj.h"
 
-namespace SSVM {
+namespace WasmEdge {
 namespace Host {
 
-class SSVMTensorflowLiteModule : public Runtime::ImportObject {
+class WasmEdgeTensorflowLiteModule : public Runtime::ImportObject {
 public:
-  SSVMTensorflowLiteModule();
-  ~SSVMTensorflowLiteModule() = default;
+  WasmEdgeTensorflowLiteModule();
+  ~WasmEdgeTensorflowLiteModule() = default;
 };
 
 } // namespace Host
-} // namespace SSVM
+} // namespace WasmEdge

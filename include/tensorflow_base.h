@@ -10,12 +10,12 @@
 #include "common/errcode.h"
 #include "runtime/hostfunc.h"
 
-namespace SSVM {
+namespace WasmEdge {
 namespace Host {
 
-struct SSVMTensorflowContext {
-  SSVMTensorflowContext() { Stat = TF_NewStatus(); }
-  ~SSVMTensorflowContext() {
+struct WasmEdgeTensorflowContext {
+  WasmEdgeTensorflowContext() { Stat = TF_NewStatus(); }
+  ~WasmEdgeTensorflowContext() {
     if (GraphOpts) {
       TF_DeleteImportGraphDefOptions(GraphOpts);
     }
@@ -59,10 +59,11 @@ struct SSVMTensorflowContext {
   std::vector<TF_Tensor *> OutputTensors;
 };
 
-template <typename T> class SSVMTensorflow : public Runtime::HostFunction<T> {
+template <typename T>
+class WasmEdgeTensorflow : public Runtime::HostFunction<T> {
 public:
-  SSVMTensorflow() : Runtime::HostFunction<T>(0) {}
+  WasmEdgeTensorflow() : Runtime::HostFunction<T>(0) {}
 };
 
 } // namespace Host
-} // namespace SSVM
+} // namespace WasmEdge

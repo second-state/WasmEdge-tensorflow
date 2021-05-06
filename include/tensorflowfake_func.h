@@ -5,17 +5,17 @@
 #include "runtime/hostfunc.h"
 #include "runtime/instance/memory.h"
 
-namespace SSVM {
+namespace WasmEdge {
 namespace Host {
 
 template <typename T>
-class SSVMTensorflowFake : public Runtime::HostFunction<T> {
+class WasmEdgeTensorflowFake : public Runtime::HostFunction<T> {
 public:
-  SSVMTensorflowFake() : Runtime::HostFunction<T>(0) {}
+  WasmEdgeTensorflowFake() : Runtime::HostFunction<T>(0) {}
 };
 
-class SSVMTensorflowFakeCreateSession
-    : public SSVMTensorflowFake<SSVMTensorflowFakeCreateSession> {
+class WasmEdgeTensorflowFakeCreateSession
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeCreateSession> {
 public:
   Expect<uint64_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint32_t ModBufPtr, uint32_t ModBufLen) {
@@ -23,16 +23,16 @@ public:
   }
 };
 
-class SSVMTensorflowFakeDeleteSession
-    : public SSVMTensorflowFake<SSVMTensorflowFakeDeleteSession> {
+class WasmEdgeTensorflowFakeDeleteSession
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeDeleteSession> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
     return {};
   }
 };
 
-class SSVMTensorflowFakeRunSession
-    : public SSVMTensorflowFake<SSVMTensorflowFakeRunSession> {
+class WasmEdgeTensorflowFakeRunSession
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeRunSession> {
 public:
   Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint64_t Cxt) {
@@ -40,8 +40,8 @@ public:
   }
 };
 
-class SSVMTensorflowFakeGetOutputTensor
-    : public SSVMTensorflowFake<SSVMTensorflowFakeGetOutputTensor> {
+class WasmEdgeTensorflowFakeGetOutputTensor
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeGetOutputTensor> {
 public:
   Expect<uint64_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint64_t Cxt, uint32_t OutputPtr, uint32_t OutputLen,
@@ -50,8 +50,8 @@ public:
   }
 };
 
-class SSVMTensorflowFakeGetTensorLen
-    : public SSVMTensorflowFake<SSVMTensorflowFakeGetTensorLen> {
+class WasmEdgeTensorflowFakeGetTensorLen
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeGetTensorLen> {
 public:
   Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint64_t Tensor) {
@@ -59,8 +59,8 @@ public:
   }
 };
 
-class SSVMTensorflowFakeGetTensorData
-    : public SSVMTensorflowFake<SSVMTensorflowFakeGetTensorData> {
+class WasmEdgeTensorflowFakeGetTensorData
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeGetTensorData> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
                     uint32_t BufPtr) {
@@ -68,8 +68,8 @@ public:
   }
 };
 
-class SSVMTensorflowFakeAppendInput
-    : public SSVMTensorflowFake<SSVMTensorflowFakeAppendInput> {
+class WasmEdgeTensorflowFakeAppendInput
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeAppendInput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
                     uint32_t InputPtr, uint32_t InputLen, uint32_t Idx,
@@ -79,8 +79,8 @@ public:
   }
 };
 
-class SSVMTensorflowFakeAppendOutput
-    : public SSVMTensorflowFake<SSVMTensorflowFakeAppendOutput> {
+class WasmEdgeTensorflowFakeAppendOutput
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeAppendOutput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
                     uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx) {
@@ -88,16 +88,16 @@ public:
   }
 };
 
-class SSVMTensorflowFakeClearInput
-    : public SSVMTensorflowFake<SSVMTensorflowFakeClearInput> {
+class WasmEdgeTensorflowFakeClearInput
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeClearInput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
     return {};
   }
 };
 
-class SSVMTensorflowFakeClearOutput
-    : public SSVMTensorflowFake<SSVMTensorflowFakeClearOutput> {
+class WasmEdgeTensorflowFakeClearOutput
+    : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeClearOutput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
     return {};
@@ -105,4 +105,4 @@ public:
 };
 
 } // namespace Host
-} // namespace SSVM
+} // namespace WasmEdge

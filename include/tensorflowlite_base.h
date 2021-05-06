@@ -10,12 +10,12 @@
 #include "common/errcode.h"
 #include "runtime/hostfunc.h"
 
-namespace SSVM {
+namespace WasmEdge {
 namespace Host {
 
-struct SSVMTensorflowLiteContext {
-  SSVMTensorflowLiteContext() = default;
-  ~SSVMTensorflowLiteContext() {
+struct WasmEdgeTensorflowLiteContext {
+  WasmEdgeTensorflowLiteContext() = default;
+  ~WasmEdgeTensorflowLiteContext() {
     if (Interp) {
       TfLiteInterpreterDelete(Interp);
     }
@@ -24,10 +24,10 @@ struct SSVMTensorflowLiteContext {
 };
 
 template <typename T>
-class SSVMTensorflowLite : public Runtime::HostFunction<T> {
+class WasmEdgeTensorflowLite : public Runtime::HostFunction<T> {
 public:
-  SSVMTensorflowLite() : Runtime::HostFunction<T>(0) {}
+  WasmEdgeTensorflowLite() : Runtime::HostFunction<T>(0) {}
 };
 
 } // namespace Host
-} // namespace SSVM
+} // namespace WasmEdge

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 cmake_minimum_required(VERSION 3.11)
-project(SSVM-Tensorflow)
+project(WasmEdge-Tensorflow)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -18,60 +18,55 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_ENABLE_EXPORTS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-option(BUILD_TOOLS "Generate ssvm and ssvmc tools." OFF)
-option(BUILD_TOOLS_SSVM_TENSORFLOW "Generate ssvm-tensorflow tools." ON)
+option(BUILD_TOOLS "Generate wasmedge and wasmedgec tools." OFF)
 
 find_package(Boost "1.68.0" REQUIRED)
 
-# Clone ssvm-core
-if(NOT SSVM_CORE_PATH)
+# Clone WasmEdge-core
+if(NOT WASMEDGE_CORE_PATH)
   include(FetchContent)
   FetchContent_Declare(
-    ssvm
-    GIT_REPOSITORY https://github.com/second-state/SSVM.git
+    wasmedge
+    GIT_REPOSITORY https://github.com/WasmEdge/WasmEdge.git
     GIT_TAG master
   )
 
-  FetchContent_GetProperties(ssvm)
-  if(NOT ssvm_POPULATED)
-    message(STATUS "Fetching ssvm repository")
-    FetchContent_Populate(ssvm)
-    message(STATUS "Fetching ssvm repository - done")
+  FetchContent_GetProperties(wasmedge)
+  if(NOT wasmedge_POPULATED)
+    message(STATUS "Fetching WasmEdge repository")
+    FetchContent_Populate(wasmedge)
+    message(STATUS "Fetching WasmEdge repository - done")
   endif()
-  # Add the include only because this project needs ssvm headers only.
-  add_subdirectory(${ssvm_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core/include)
-  set(SSVM_CORE_PATH ${ssvm_SOURCE_DIR})
-  set(SSVM_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
+  # Add the include only because this project needs WasmEdge headers only.
+  add_subdirectory(${wasmedge_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core/include)
+  set(WASMEDGE_CORE_PATH ${wasmedge_SOURCE_DIR})
+  set(WASMEDGE_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core)
 else()
   get_filename_component(
-    SSVM_CORE_PATH "${SSVM_CORE_PATH}"
+    WASMEDGE_CORE_PATH "${WASMEDGE_CORE_PATH}"
     REALPATH
     BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-  if(NOT SSVM_CORE_BIN_PATH)
-    # Add the include only because this project needs ssvm headers only.
-    add_subdirectory(${SSVM_CORE_PATH}/include ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core/include)
-    set(SSVM_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/ssvm-core)
+  if(NOT WASMEDGE_CORE_BIN_PATH)
+    # Add the include only because this project needs WasmEdge headers only.
+    add_subdirectory(${WASMEDGE_CORE_PATH}/include ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core/include)
+    set(WASMEDGE_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core)
   else()
     get_filename_component(
-      SSVM_CORE_BIN_PATH "${SSVM_CORE_BIN_PATH}"
+      WASMEDGE_CORE_BIN_PATH "${WASMEDGE_CORE_BIN_PATH}"
       REALPATH
       BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
   endif()
 endif()
 
-message(STATUS "Set ssvm-core source path: ${SSVM_CORE_PATH}")
-message(STATUS "Set ssvm-core binary path: ${SSVM_CORE_BIN_PATH}")
+message(STATUS "Set WasmEdge-core source path: ${WASMEDGE_CORE_PATH}")
+message(STATUS "Set WasmEdge-core binary path: ${WASMEDGE_CORE_BIN_PATH}")
 
 # TensorFlow dependencies library
-add_subdirectory(utils/ssvm-tensorflow-deps)
+add_subdirectory(utils/WasmEdge-tensorflow-deps)
 
 include_directories(BEFORE
   ${CMAKE_CURRENT_BINARY_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-include_directories(BEFORE
-  ${SSVM_IMAGE_BIN_PATH}/include
-  ${SSVM_IMAGE_PATH}/include
 )
 
 add_subdirectory(include)

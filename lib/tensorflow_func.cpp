@@ -8,26 +8,26 @@
 #include "common/span.h"
 #include "tensorflow_func.h"
 
-namespace SSVM {
+namespace WasmEdge {
 namespace Host {
 
-Expect<uint64_t>
-SSVMTensorflowCreateSession::body(Runtime::Instance::MemoryInstance *MemInst,
-                                  uint32_t ModBufPtr, uint32_t ModBufLen) {
+Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint32_t ModBufPtr,
+    uint32_t ModBufLen) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
   /// Create context and import graph.
-  struct SSVMTensorflowContext *Cxt = new SSVMTensorflowContext();
+  struct WasmEdgeTensorflowContext *Cxt = new WasmEdgeTensorflowContext();
   Cxt->Graph = TF_NewGraph();
   Cxt->Buffer =
       TF_NewBufferFromString(MemInst->getPointer<char *>(ModBufPtr), ModBufLen);
   Cxt->GraphOpts = TF_NewImportGraphDefOptions();
   TF_GraphImportGraphDef(Cxt->Graph, Cxt->Buffer, Cxt->GraphOpts, Cxt->Stat);
   if (TF_GetCode(Cxt->Stat) != TF_OK) {
-    LOG(ERROR) << "ssvm_tensorflow_create_session: Cannot import graph: "
+    LOG(ERROR) << "wasmedge_tensorflow_create_session: Cannot import graph: "
                << TF_Message(Cxt->Stat);
     delete Cxt;
     return 0;
@@ -37,19 +37,19 @@ SSVMTensorflowCreateSession::body(Runtime::Instance::MemoryInstance *MemInst,
   Cxt->SessionOpts = TF_NewSessionOptions();
   Cxt->Session = TF_NewSession(Cxt->Graph, Cxt->SessionOpts, Cxt->Stat);
   if (TF_GetCode(Cxt->Stat) != TF_OK) {
-    LOG(ERROR) << "ssvm_tensorflow_create_session: Unable to create session: "
-               << TF_Message(Cxt->Stat);
+    LOG(ERROR)
+        << "wasmedge_tensorflow_create_session: Unable to create session: "
+        << TF_Message(Cxt->Stat);
     delete Cxt;
     return 0;
   }
   return static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(Cxt));
 }
 
-Expect<void>
-SSVMTensorflowDeleteSession::body(Runtime::Instance::MemoryInstance *MemInst,
-                                  uint64_t Cxt) {
+Expect<void> WasmEdgeTensorflowDeleteSession::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   if (C != nullptr) {
     delete C;
   }
@@ -57,10 +57,10 @@ SSVMTensorflowDeleteSession::body(Runtime::Instance::MemoryInstance *MemInst,
 }
 
 Expect<uint32_t>
-SSVMTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
-                               uint64_t Cxt) {
+WasmEdgeTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
+                                   uint64_t Cxt) {
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
 
   /// Delete old output tensors
   for (auto T : C->OutputTensors) {
@@ -85,24 +85,23 @@ SSVMTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
                 C->Stat);
 
   if (TF_GetCode(C->Stat) != TF_OK) {
-    LOG(ERROR) << "ssvm_tensorflow_run_session: Unable to run session: "
+    LOG(ERROR) << "wasmedge_tensorflow_run_session: Unable to run session: "
                << TF_Message(C->Stat);
     return 1;
   }
   return 0;
 }
 
-Expect<uint64_t>
-SSVMTensorflowGetOutputTensor::body(Runtime::Instance::MemoryInstance *MemInst,
-                                    uint64_t Cxt, uint32_t OutputPtr,
-                                    uint32_t OutputLen, uint32_t Idx) {
+Expect<uint64_t> WasmEdgeTensorflowGetOutputTensor::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
+    uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
 
   /// Find the output tensor
   std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
@@ -116,8 +115,8 @@ SSVMTensorflowGetOutputTensor::body(Runtime::Instance::MemoryInstance *MemInst,
 }
 
 Expect<uint32_t>
-SSVMTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
-                                 uint64_t Tensor) {
+WasmEdgeTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
+                                     uint64_t Tensor) {
   /// Return tensor data length.
   TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
   if (T != nullptr) {
@@ -126,9 +125,9 @@ SSVMTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
   return 0;
 }
 
-Expect<void>
-SSVMTensorflowGetTensorData::body(Runtime::Instance::MemoryInstance *MemInst,
-                                  uint64_t Tensor, uint32_t BufPtr) {
+Expect<void> WasmEdgeTensorflowGetTensorData::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
+    uint32_t BufPtr) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
@@ -146,7 +145,7 @@ SSVMTensorflowGetTensorData::body(Runtime::Instance::MemoryInstance *MemInst,
   return {};
 }
 
-Expect<void> SSVMTensorflowAppendInput::body(
+Expect<void> WasmEdgeTensorflowAppendInput::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt, uint32_t InputPtr,
     uint32_t InputLen, uint32_t Idx, uint32_t DimPtr, uint32_t DimCnt,
     uint32_t DataType, uint32_t TensorBufPtr, uint32_t TensorBufLen) {
@@ -156,7 +155,7 @@ Expect<void> SSVMTensorflowAppendInput::body(
   }
 
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
 
   /// Allocate tensor and data copying
   TF_Tensor *Tensor = nullptr;
@@ -183,16 +182,16 @@ Expect<void> SSVMTensorflowAppendInput::body(
 }
 
 Expect<void>
-SSVMTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                 uint64_t Cxt, uint32_t OutputPtr,
-                                 uint32_t OutputLen, uint32_t Idx) {
+WasmEdgeTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
+                                     uint64_t Cxt, uint32_t OutputPtr,
+                                     uint32_t OutputLen, uint32_t Idx) {
   /// Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
   C->OutputTensors.push_back(nullptr);
 
@@ -204,9 +203,9 @@ SSVMTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
 }
 
 Expect<void>
-SSVMTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst,
-                               uint64_t Cxt) {
-  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+WasmEdgeTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst,
+                                   uint64_t Cxt) {
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   C->Inputs.clear();
   C->InputNames.clear();
   for (auto T : C->InputTensors) {
@@ -219,9 +218,9 @@ SSVMTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst,
 }
 
 Expect<void>
-SSVMTensorflowClearOutput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                uint64_t Cxt) {
-  auto *C = reinterpret_cast<struct SSVMTensorflowContext *>(Cxt);
+WasmEdgeTensorflowClearOutput::body(Runtime::Instance::MemoryInstance *MemInst,
+                                    uint64_t Cxt) {
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   C->Outputs.clear();
   C->OutputNames.clear();
   for (auto T : C->OutputTensors) {
@@ -234,4 +233,4 @@ SSVMTensorflowClearOutput::body(Runtime::Instance::MemoryInstance *MemInst,
 }
 
 } // namespace Host
-} // namespace SSVM
+} // namespace WasmEdge

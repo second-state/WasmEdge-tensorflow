@@ -1,4 +1,4 @@
-[submodule "utils/ssvm-tensorflow-deps"]
-	path = utils/ssvm-tensorflow-deps
-	url = https://github.com/second-state/ssvm-tensorflow-deps.git
-	branch = 0.7.3
+[submodule "utils/WasmEdge-tensorflow-deps"]
+	path = utils/WasmEdge-tensorflow-deps
+	url = https://github.com/second-state/WasmEdge-tensorflow-deps.git
+	branch = 0.8.0

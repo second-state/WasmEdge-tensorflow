@@ -10,11 +10,11 @@ SPDXID: SPDXRef-DOCUMENT
 DocumentNamespace: https://secondstate.io/ssvm
 DocumentName: LICENSE.spdx
 
-Creator: Organization: Second State LCC (contact@secondstate.io)
+Creator: Organization: Second State INC (contact@secondstate.io)
 
 ## Package Information
-PackageName: ssvm-tensorflow
-SPDXID: SPDXRef-ssvm-tensorflow
-PackageOriginator: Organization: Second State LCC (contact@secondstate.io)
-PackageLicenseDeclared: (Apache-2.0)
+PackageName: wasmedge-tensorflow
+SPDXID: SPDXRef-wasmedge-tensorflow
+PackageOriginator: Organization: Second State INC (contact@secondstate.io)
+PackageLicenseDeclared: Apache-2.0
 FilesAnalyzed: false

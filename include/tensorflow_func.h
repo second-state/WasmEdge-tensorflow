@@ -6,53 +6,53 @@
 #include "runtime/instance/memory.h"
 #include "tensorflow_base.h"
 
-namespace SSVM {
+namespace WasmEdge {
 namespace Host {
 
-class SSVMTensorflowCreateSession
-    : public SSVMTensorflow<SSVMTensorflowCreateSession> {
+class WasmEdgeTensorflowCreateSession
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowCreateSession> {
 public:
   Expect<uint64_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint32_t ModBufPtr, uint32_t ModBufLen);
 };
 
-class SSVMTensorflowDeleteSession
-    : public SSVMTensorflow<SSVMTensorflowDeleteSession> {
+class WasmEdgeTensorflowDeleteSession
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowDeleteSession> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt);
 };
 
-class SSVMTensorflowRunSession
-    : public SSVMTensorflow<SSVMTensorflowRunSession> {
+class WasmEdgeTensorflowRunSession
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowRunSession> {
 public:
   Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint64_t Cxt);
 };
 
-class SSVMTensorflowGetOutputTensor
-    : public SSVMTensorflow<SSVMTensorflowGetOutputTensor> {
+class WasmEdgeTensorflowGetOutputTensor
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowGetOutputTensor> {
 public:
   Expect<uint64_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint64_t Cxt, uint32_t OutputPtr, uint32_t OutputLen,
                         uint32_t Idx);
 };
 
-class SSVMTensorflowGetTensorLen
-    : public SSVMTensorflow<SSVMTensorflowGetTensorLen> {
+class WasmEdgeTensorflowGetTensorLen
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowGetTensorLen> {
 public:
   Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
                         uint64_t Tensor);
 };
 
-class SSVMTensorflowGetTensorData
-    : public SSVMTensorflow<SSVMTensorflowGetTensorData> {
+class WasmEdgeTensorflowGetTensorData
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowGetTensorData> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
                     uint32_t BufPtr);
 };
 
-class SSVMTensorflowAppendInput
-    : public SSVMTensorflow<SSVMTensorflowAppendInput> {
+class WasmEdgeTensorflowAppendInput
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowAppendInput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
                     uint32_t InputPtr, uint32_t InputLen, uint32_t Idx,
@@ -60,24 +60,24 @@ public:
                     uint32_t TensorBufPtr, uint32_t TensorBufLen);
 };
 
-class SSVMTensorflowAppendOutput
-    : public SSVMTensorflow<SSVMTensorflowAppendOutput> {
+class WasmEdgeTensorflowAppendOutput
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowAppendOutput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
                     uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx);
 };
 
-class SSVMTensorflowClearInput
-    : public SSVMTensorflow<SSVMTensorflowClearInput> {
+class WasmEdgeTensorflowClearInput
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowClearInput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt);
 };
 
-class SSVMTensorflowClearOutput
-    : public SSVMTensorflow<SSVMTensorflowClearOutput> {
+class WasmEdgeTensorflowClearOutput
+    : public WasmEdgeTensorflow<WasmEdgeTensorflowClearOutput> {
 public:
   Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt);
 };
 
 } // namespace Host
-} // namespace SSVM
+} // namespace WasmEdge

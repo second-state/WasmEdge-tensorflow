@@ -8,10 +8,10 @@
 #include "common/span.h"
 #include "tensorflowlite_func.h"
 
-namespace SSVM {
+namespace WasmEdge {
 namespace Host {
 
-Expect<uint64_t> SSVMTensorflowLiteCreateSession::body(
+Expect<uint64_t> WasmEdgeTensorflowLiteCreateSession::body(
     Runtime::Instance::MemoryInstance *MemInst, uint32_t ModBufPtr,
     uint32_t ModBufLen) {
   /// Check memory instance from module.
@@ -20,12 +20,13 @@ Expect<uint64_t> SSVMTensorflowLiteCreateSession::body(
   }
 
   /// Create context and import graph.
-  struct SSVMTensorflowLiteContext *Cxt = new SSVMTensorflowLiteContext();
+  struct WasmEdgeTensorflowLiteContext *Cxt =
+      new WasmEdgeTensorflowLiteContext();
   auto *Model =
       TfLiteModelCreate(MemInst->getPointer<char *>(ModBufPtr), ModBufLen);
   if (Model == nullptr) {
-    LOG(ERROR)
-        << "ssvm_tensorflowlite_create_session: Cannot import TFLite model.";
+    LOG(ERROR) << "wasmedge_tensorflowlite_create_session: Cannot import "
+                  "TFLite model.";
     return 0;
   }
   auto *Ops = TfLiteInterpreterOptionsCreate();
@@ -34,40 +35,40 @@ Expect<uint64_t> SSVMTensorflowLiteCreateSession::body(
   TfLiteInterpreterOptionsDelete(Ops);
   TfLiteModelDelete(Model);
   if (Cxt->Interp == nullptr) {
-    LOG(ERROR) << "ssvm_tensorflowlite_create_session: Cannot create TFLite "
-                  "interpreter.";
+    LOG(ERROR)
+        << "wasmedge_tensorflowlite_create_session: Cannot create TFLite "
+           "interpreter.";
     return 0;
   }
   TfLiteInterpreterAllocateTensors(Cxt->Interp);
   return static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(Cxt));
 }
 
-Expect<void> SSVMTensorflowLiteDeleteSession::body(
+Expect<void> WasmEdgeTensorflowLiteDeleteSession::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowLiteContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
   if (C != nullptr) {
     delete C;
   }
   return {};
 }
 
-Expect<uint32_t>
-SSVMTensorflowLiteRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
-                                   uint64_t Cxt) {
+Expect<uint32_t> WasmEdgeTensorflowLiteRunSession::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowLiteContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
 
   /// Run session
   TfLiteStatus Stat = TfLiteInterpreterInvoke(C->Interp);
   if (Stat != TfLiteStatus::kTfLiteOk) {
-    LOG(ERROR) << "ssvm_tensorflowlite_run_session: Invokation failed.";
+    LOG(ERROR) << "wasmedge_tensorflowlite_run_session: Invokation failed.";
     return 1;
   }
   return 0;
 }
 
-Expect<uint64_t> SSVMTensorflowLiteGetOutputTensor::body(
+Expect<uint64_t> WasmEdgeTensorflowLiteGetOutputTensor::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
     uint32_t OutputPtr, uint32_t OutputLen) {
   /// Check memory instance from module.
@@ -76,7 +77,7 @@ Expect<uint64_t> SSVMTensorflowLiteGetOutputTensor::body(
   }
 
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowLiteContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
 
   /// Find the output tensor
   std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
@@ -91,9 +92,8 @@ Expect<uint64_t> SSVMTensorflowLiteGetOutputTensor::body(
   return 0;
 }
 
-Expect<uint32_t>
-SSVMTensorflowLiteGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
-                                     uint64_t Tensor) {
+Expect<uint32_t> WasmEdgeTensorflowLiteGetTensorLen::body(
+    Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor) {
   /// Return tensor data length.
   TfLiteTensor *T = reinterpret_cast<TfLiteTensor *>(Tensor);
   if (T != nullptr) {
@@ -102,7 +102,7 @@ SSVMTensorflowLiteGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
   return 0;
 }
 
-Expect<void> SSVMTensorflowLiteGetTensorData::body(
+Expect<void> WasmEdgeTensorflowLiteGetTensorData::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
     uint32_t BufPtr) {
   /// Check memory instance from module.
@@ -121,7 +121,7 @@ Expect<void> SSVMTensorflowLiteGetTensorData::body(
   return {};
 }
 
-Expect<void> SSVMTensorflowLiteAppendInput::body(
+Expect<void> WasmEdgeTensorflowLiteAppendInput::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt, uint32_t InputPtr,
     uint32_t InputLen, uint32_t TensorBufPtr, uint32_t TensorBufLen) {
   /// Check memory instance from module.
@@ -130,7 +130,7 @@ Expect<void> SSVMTensorflowLiteAppendInput::body(
   }
 
   /// Context struct
-  auto *C = reinterpret_cast<struct SSVMTensorflowLiteContext *>(Cxt);
+  auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
 
   /// Find the input tensor
   std::string Name(MemInst->getPointer<char *>(InputPtr), InputLen);
@@ -148,4 +148,4 @@ Expect<void> SSVMTensorflowLiteAppendInput::body(
 }
 
 } // namespace Host
-} // namespace SSVM
+} // namespace WasmEdge

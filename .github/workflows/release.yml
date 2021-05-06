@@ -10,7 +10,7 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     container:
-      image: secondstate/ssvm:ubuntu-build-gcc
+      image: wasmedge/wasmedge:ubuntu-build-gcc
     outputs:
       version: ${{ steps.prep.outputs.version }}
       upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -30,16 +30,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: SSVM-TensorFlow ${{ steps.prep.outputs.version }}
+          release_name: WasmEdge-TensorFlow ${{ steps.prep.outputs.version }}
           body_path: .CurrentChangelog.md
           draft: false
           prerelease: false
   build_and_upload_manylinux2014_x86_64:
-    name: Build SSVM-TensorFlow on manylinux2014_x86_64 platform
+    name: Build WasmEdge-TensorFlow on manylinux2014_x86_64 platform
     needs: [create]
     runs-on: ubuntu-latest
     container:
-      image: secondstate/ssvm:manylinux2014_x86_64
+      image: wasmedge/wasmedge:manylinux2014_x86_64
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -47,7 +47,7 @@ jobs:
           submodules: true
       - name: Build manylinux2014_x86_64 package
         run: |
-          curl -s -L -O --remote-name-all https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
+          curl -s -L -O --remote-name-all https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.bz2
           bzip2 -dc boost_1_75_0.tar.bz2 | tar -xf -
           yum check-update || true
           yum install -y rpm-build
@@ -55,55 +55,55 @@ jobs:
           export CC=gcc
           export CXX=g++
           rm -rf build
-          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOL_SSVM_STATIC=Off -DBOOST_INCLUDEDIR=./boost_1_75_0/ .
+          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBOOST_INCLUDEDIR=./boost_1_75_0/ .
           cmake --build build
-          cp include/ssvm-tensorflow.h build/include
-          cp include/ssvm-tensorflowlite.h build/include
+          cp include/wasmedge-tensorflow.h build/include
+          cp include/wasmedge-tensorflowlite.h build/include
           cd build
-          tar -zcvf ssvm-tf.tar.gz include/ssvm-tensorflow.h lib/libssvm-tensorflow_c.so
-          tar Jcvf ssvm-tf.tar.xz include/ssvm-tensorflow.h lib/libssvm-tensorflow_c.so
-          tar -zcvf ssvm-tflite.tar.gz include/ssvm-tensorflowlite.h lib/libssvm-tensorflowlite_c.so
-          tar Jcvf ssvm-tflite.tar.xz include/ssvm-tensorflowlite.h lib/libssvm-tensorflowlite_c.so
+          tar -zcvf wasmedge-tf.tar.gz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
+          tar Jcvf wasmedge-tf.tar.xz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
+          tar -zcvf wasmedge-tflite.tar.gz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+          tar Jcvf wasmedge-tflite.tar.xz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
           cd ..
-          mv build/ssvm-tf.tar.gz ssvm-tf.tar.gz
-          mv build/ssvm-tf.tar.xz ssvm-tf.tar.xz
-          mv build/ssvm-tflite.tar.gz ssvm-tflite.tar.gz
-          mv build/ssvm-tflite.tar.xz ssvm-tflite.tar.xz
+          mv build/wasmedge-tf.tar.gz wasmedge-tf.tar.gz
+          mv build/wasmedge-tf.tar.xz wasmedge-tf.tar.xz
+          mv build/wasmedge-tflite.tar.gz wasmedge-tflite.tar.gz
+          mv build/wasmedge-tflite.tar.xz wasmedge-tflite.tar.xz
           ls -alF
-      - name: Upload ssvm-tensorflow manylinux2014_x86_64 tar.gz package
+      - name: Upload WasmEdge-tensorflow manylinux2014_x86_64 tar.gz package
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create.outputs.upload_url }}
-          asset_path: ssvm-tf.tar.gz
-          asset_name: ssvm-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.gz
+          asset_path: wasmedge-tf.tar.gz
+          asset_name: WasmEdge-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.gz
           asset_content_type: application/x-gzip
-      - name: Upload ssvm-tensorflow manylinux2014_x86_64 tar.xz package
+      - name: Upload WasmEdge-tensorflow manylinux2014_x86_64 tar.xz package
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create.outputs.upload_url }}
-          asset_path: ssvm-tf.tar.xz
-          asset_name: ssvm-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
+          asset_path: wasmedge-tf.tar.xz
+          asset_name: WasmEdge-tensorflow-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
           asset_content_type: application/x-xz
-      - name: Upload ssvm-tensorflowlite manylinux2014_x86_64 tar.gz package
+      - name: Upload WasmEdge-tensorflowlite manylinux2014_x86_64 tar.gz package
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create.outputs.upload_url }}
-          asset_path: ssvm-tflite.tar.gz
-          asset_name: ssvm-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.gz
+          asset_path: wasmedge-tflite.tar.gz
+          asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.gz
           asset_content_type: application/x-gzip
-      - name: Upload ssvm-tensorflowlite manylinux2014_x86_64 tar.xz package
+      - name: Upload WasmEdge-tensorflowlite manylinux2014_x86_64 tar.xz package
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create.outputs.upload_url }}
-          asset_path: ssvm-tflite.tar.xz
-          asset_name: ssvm-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
+          asset_path: wasmedge-tflite.tar.xz
+          asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
           asset_content_type: application/x-xz
           
