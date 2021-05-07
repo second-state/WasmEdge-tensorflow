@@ -49,16 +49,12 @@ jobs:
         run: |
           curl -s -L -O --remote-name-all https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.bz2
           bzip2 -dc boost_1_75_0.tar.bz2 | tar -xf -
-          yum check-update || true
-          yum install -y rpm-build
           export PATH="/toolchain/bin:$PATH"
           export CC=gcc
           export CXX=g++
           rm -rf build
-          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBOOST_INCLUDEDIR=./boost_1_75_0/ .
+          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=Off -DBOOST_INCLUDEDIR=./boost_1_75_0/ .
           cmake --build build
-          cp include/wasmedge-tensorflow.h build/include
-          cp include/wasmedge-tensorflowlite.h build/include
           cd build
           tar -zcvf wasmedge-tf.tar.gz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
           tar Jcvf wasmedge-tf.tar.xz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
