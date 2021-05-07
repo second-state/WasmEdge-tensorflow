@@ -10,33 +10,33 @@ on:
 
 jobs:
   build_manylinux2014_x86_64:
-    name: Build WasmEdge-image using g++ on manylinux2014_x86_64 platform
+    name: Build WasmEdge-TensorFlow using g++ on manylinux2014_x86_64 platform
     runs-on: ubuntu-latest
     container:
       image: wasmedge/wasmedge:manylinux2014_x86_64
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-      - name: Build manylinux2014_x86_64 package
-        run: |
-          curl -s -L -O --remote-name-all https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.bz2
-          bzip2 -dc boost_1_75_0.tar.bz2 | tar -xf -
-          export PATH="/toolchain/bin:$PATH"
-          export CC=gcc
-          export CXX=g++
-          rm -rf build
-          cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=Off -DBOOST_INCLUDEDIR=./boost_1_75_0/ .
-          cmake --build build
-          cd build
-          tar -zcvf wasmedge-tf.tar.gz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
-          tar Jcvf wasmedge-tf.tar.xz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
-          tar -zcvf wasmedge-tflite.tar.gz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
-          tar Jcvf wasmedge-tflite.tar.xz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
-          cd ..
-          mv build/wasmedge-tf.tar.gz wasmedge-tf.tar.gz
-          mv build/wasmedge-tf.tar.xz wasmedge-tf.tar.xz
-          mv build/wasmedge-tflite.tar.gz wasmedge-tflite.tar.gz
-          mv build/wasmedge-tflite.tar.xz wasmedge-tflite.tar.xz
-          ls -alF
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Build manylinux2014_x86_64 package
+      run: |
+        curl -s -L -O --remote-name-all https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.bz2
+        bzip2 -dc boost_1_75_0.tar.bz2 | tar -xf -
+        export PATH="/toolchain/bin:$PATH"
+        export CC=gcc
+        export CXX=g++
+        rm -rf build
+        cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBUILD_TOOLS=Off -DBOOST_INCLUDEDIR=./boost_1_75_0/ .
+        cmake --build build
+        cd build
+        tar -zcvf wasmedge-tf.tar.gz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
+        tar Jcvf wasmedge-tf.tar.xz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
+        tar -zcvf wasmedge-tflite.tar.gz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+        tar Jcvf wasmedge-tflite.tar.xz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+        cd ..
+        mv build/wasmedge-tf.tar.gz wasmedge-tf.tar.gz
+        mv build/wasmedge-tf.tar.xz wasmedge-tf.tar.xz
+        mv build/wasmedge-tflite.tar.gz wasmedge-tflite.tar.gz
+        mv build/wasmedge-tflite.tar.xz wasmedge-tflite.tar.xz
+        ls -alF
