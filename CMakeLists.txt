@@ -37,8 +37,7 @@ if(NOT WASMEDGE_CORE_PATH)
     FetchContent_Populate(wasmedge)
     message(STATUS "Fetching WasmEdge repository - done")
   endif()
-  # Add the include only because this project needs WasmEdge headers only.
-  add_subdirectory(${wasmedge_SOURCE_DIR}/include ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core/include)
+  add_subdirectory(${wasmedge_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core)
   set(WASMEDGE_CORE_PATH ${wasmedge_SOURCE_DIR})
   set(WASMEDGE_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core)
 else()
@@ -47,8 +46,7 @@ else()
     REALPATH
     BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
   if(NOT WASMEDGE_CORE_BIN_PATH)
-    # Add the include only because this project needs WasmEdge headers only.
-    add_subdirectory(${WASMEDGE_CORE_PATH}/include ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core/include)
+    add_subdirectory(${WASMEDGE_CORE_PATH} ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core)
     set(WASMEDGE_CORE_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/utils/WasmEdge-core)
   else()
     get_filename_component(

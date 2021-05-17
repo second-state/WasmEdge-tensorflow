@@ -38,8 +38,14 @@ target_include_directories(wasmedge-tensorflow_c
   ${WASMEDGE_CORE_BIN_PATH}/include/api
 )
 
+target_link_libraries(wasmedge-tensorflow_c
+  PRIVATE
+  wasmedgeCommon
+  wasmedgeSystem
+)
+
 add_library(wasmedge-tensorflowlite_c SHARED
-  wasmedge-tensorflow.cpp
+  wasmedge-tensorflowlite.cpp
   tensorflowlite_module.cpp
   tensorflowlite_func.cpp
 )
@@ -50,4 +56,10 @@ target_include_directories(wasmedge-tensorflowlite_c
   ${WASMEDGE_CORE_PATH}/include
   ${WASMEDGE_CORE_PATH}/thirdparty
   ${WASMEDGE_CORE_BIN_PATH}/include/api
+)
+
+target_link_libraries(wasmedge-tensorflowlite_c
+  PRIVATE
+  wasmedgeCommon
+  wasmedgeSystem
 )
