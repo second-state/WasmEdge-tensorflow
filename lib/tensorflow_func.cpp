@@ -27,8 +27,10 @@ Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
   Cxt->GraphOpts = TF_NewImportGraphDefOptions();
   TF_GraphImportGraphDef(Cxt->Graph, Cxt->Buffer, Cxt->GraphOpts, Cxt->Stat);
   if (TF_GetCode(Cxt->Stat) != TF_OK) {
-    LOG(ERROR) << "wasmedge_tensorflow_create_session: Cannot import graph: "
-               << TF_Message(Cxt->Stat);
+    spdlog::error(
+        std::string(
+            "wasmedge_tensorflow_create_session: Cannot import graph: ") +
+        TF_Message(Cxt->Stat));
     delete Cxt;
     return 0;
   }
@@ -37,9 +39,10 @@ Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
   Cxt->SessionOpts = TF_NewSessionOptions();
   Cxt->Session = TF_NewSession(Cxt->Graph, Cxt->SessionOpts, Cxt->Stat);
   if (TF_GetCode(Cxt->Stat) != TF_OK) {
-    LOG(ERROR)
-        << "wasmedge_tensorflow_create_session: Unable to create session: "
-        << TF_Message(Cxt->Stat);
+    spdlog::error(
+        std::string(
+            "wasmedge_tensorflow_create_session: Unable to create session: ") +
+        TF_Message(Cxt->Stat));
     delete Cxt;
     return 0;
   }
@@ -85,8 +88,10 @@ WasmEdgeTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
                 C->Stat);
 
   if (TF_GetCode(C->Stat) != TF_OK) {
-    LOG(ERROR) << "wasmedge_tensorflow_run_session: Unable to run session: "
-               << TF_Message(C->Stat);
+    spdlog::error(
+        std::string(
+            "wasmedge_tensorflow_run_session: Unable to run session: ") +
+        TF_Message(C->Stat));
     return 1;
   }
   return 0;

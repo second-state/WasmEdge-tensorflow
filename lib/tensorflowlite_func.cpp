@@ -25,8 +25,8 @@ Expect<uint64_t> WasmEdgeTensorflowLiteCreateSession::body(
   auto *Model =
       TfLiteModelCreate(MemInst->getPointer<char *>(ModBufPtr), ModBufLen);
   if (Model == nullptr) {
-    LOG(ERROR) << "wasmedge_tensorflowlite_create_session: Cannot import "
-                  "TFLite model.";
+    spdlog::error("wasmedge_tensorflowlite_create_session: Cannot import "
+                  "TFLite model.");
     return 0;
   }
   auto *Ops = TfLiteInterpreterOptionsCreate();
@@ -35,9 +35,8 @@ Expect<uint64_t> WasmEdgeTensorflowLiteCreateSession::body(
   TfLiteInterpreterOptionsDelete(Ops);
   TfLiteModelDelete(Model);
   if (Cxt->Interp == nullptr) {
-    LOG(ERROR)
-        << "wasmedge_tensorflowlite_create_session: Cannot create TFLite "
-           "interpreter.";
+    spdlog::error("wasmedge_tensorflowlite_create_session: Cannot create "
+                  "TFLite interpreter.");
     return 0;
   }
   TfLiteInterpreterAllocateTensors(Cxt->Interp);
@@ -62,7 +61,7 @@ Expect<uint32_t> WasmEdgeTensorflowLiteRunSession::body(
   /// Run session
   TfLiteStatus Stat = TfLiteInterpreterInvoke(C->Interp);
   if (Stat != TfLiteStatus::kTfLiteOk) {
-    LOG(ERROR) << "wasmedge_tensorflowlite_run_session: Invokation failed.";
+    spdlog::error("wasmedge_tensorflowlite_run_session: Invokation failed.");
     return 1;
   }
   return 0;

@@ -1,3 +1,12 @@
+### 0.8.1 (2021-06-22)
+
+This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
+Please refer to the [WasmEdge 0.8.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.8.1) for more details.
+
+Features:
+
+* Update the `WasmEdge` dependency to `0.8.1`.
+
 ### 0.8.0 (2021-05-14)
 
 This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).

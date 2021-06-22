@@ -5,11 +5,16 @@ add_library(wasmedgeHostModuleWasmEdgeTensorflow
   tensorflow_func.cpp
 )
 
+target_link_libraries(wasmedgeHostModuleWasmEdgeTensorflow
+  PUBLIC
+  wasmedgeCommon
+  wasmedgeSystem
+)
+
 target_include_directories(wasmedgeHostModuleWasmEdgeTensorflow
   PUBLIC
   ${TENSORFLOW_INCLUDE}
   ${WASMEDGE_CORE_PATH}/include
-  ${WASMEDGE_CORE_PATH}/thirdparty
 )
 
 add_library(wasmedgeHostModuleWasmEdgeTensorflowLite
@@ -21,7 +26,12 @@ target_include_directories(wasmedgeHostModuleWasmEdgeTensorflowLite
   PUBLIC
   ${TENSORFLOW_INCLUDE}
   ${WASMEDGE_CORE_PATH}/include
-  ${WASMEDGE_CORE_PATH}/thirdparty
+)
+
+target_link_libraries(wasmedgeHostModuleWasmEdgeTensorflowLite
+  PUBLIC
+  wasmedgeCommon
+  wasmedgeSystem
 )
 
 if (BUILD_SHARED_LIB)
@@ -35,7 +45,6 @@ if (BUILD_SHARED_LIB)
     PUBLIC
     ${TENSORFLOW_INCLUDE}
     ${WASMEDGE_CORE_PATH}/include
-    ${WASMEDGE_CORE_PATH}/thirdparty
     ${WASMEDGE_CORE_BIN_PATH}/include/api
   )
 
@@ -55,7 +64,6 @@ if (BUILD_SHARED_LIB)
     PUBLIC
     ${TENSORFLOW_INCLUDE}
     ${WASMEDGE_CORE_PATH}/include
-    ${WASMEDGE_CORE_PATH}/thirdparty
     ${WASMEDGE_CORE_BIN_PATH}/include/api
   )
 

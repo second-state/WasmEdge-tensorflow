@@ -59,7 +59,7 @@ $ sudo apt install -y clang
 ```bash
 $ git clone --recursive git@github.com:second-state/WasmEdge-tensorflow.git
 $ cd WasmEdge-tensorflow
-$ git checkout 0.8.0
+$ git checkout 0.8.1
 ```
 
 ## Build WasmEdge-Tensorflow
