@@ -1,3 +1,13 @@
+### 0.8.2-rc2 (2021-07-28)
+
+This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
+Please refer to the [WasmEdge 0.8.2-rc.2](https://github.com/WasmEdge/WasmEdge/releases/tag/0.8.2-rc.2) for more details.
+
+Features:
+
+* Update the `WasmEdge` dependency to `0.8.2-rc.2`.
+* Modified the CMake option `BUILD_SHARED_LIB` to `WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB` for enabling compilation of the shared library (`ON` by default).
+
 ### 0.8.1 (2021-06-22)
 
 This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
