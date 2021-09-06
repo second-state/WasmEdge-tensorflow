@@ -34,7 +34,7 @@ target_link_libraries(wasmedgeHostModuleWasmEdgeTensorflowLite
   wasmedgeSystem
 )
 
-if (BUILD_SHARED_LIB)
+if (WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB)
   add_library(wasmedge-tensorflow_c SHARED
     wasmedge-tensorflow.cpp
     tensorflow_module.cpp
