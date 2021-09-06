@@ -1,12 +1,22 @@
 name: build
 
+concurrency:
+  group: build-${{ github.head_ref }}
+  cancel-in-progress: true
+  
 on:
   push:
     branches:
       - master
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
   pull_request:
     branches:
       - master
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
 
 jobs:
   build_manylinux2014_x86_64:
