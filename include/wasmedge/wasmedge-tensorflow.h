@@ -19,7 +19,7 @@
 #include <stdlib.h>
 
 /// Need to install the WasmEdge C library first.
-#include <wasmedge.h>
+#include <wasmedge/wasmedge.h>
 
 #ifdef __cplusplus
 extern "C" {

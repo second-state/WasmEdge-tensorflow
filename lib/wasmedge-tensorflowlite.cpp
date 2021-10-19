@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-#include <wasmedge.h>
-
+#include "wasmedge/wasmedge-tensorflowlite.h"
 #include "tensorflowfake_module.h"
 #include "tensorflowlite_module.h"
-#include "wasmedge-tensorflowlite.h"
 
 #ifdef __cplusplus
 extern "C" {
