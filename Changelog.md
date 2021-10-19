@@ -1,3 +1,16 @@
+### 0.9.0-rc1 (2021-10-19)
+
+This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
+Please refer to the [WasmEdge 0.9.0-rc.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.9.0-rc.1) for more details.
+
+Breaking changes:
+
+* Moved the C-API headers `wasmedge-tensorflow.h` and `wasmedge-tensorflowlite.h` into the `wasmedge` folder.
+
+Features:
+
+* Update the `WasmEdge` dependency to `0.9.0-rc.1`.
+
 ### 0.8.2 (2021-09-06)
 
 This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
