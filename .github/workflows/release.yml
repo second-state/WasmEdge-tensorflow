@@ -58,10 +58,10 @@ jobs:
         cmake -Bbuild -DCMAKE_BUILD_TYPE=Release .
         cmake --build build
         cd build
-        tar -zcvf wasmedge-tf.tar.gz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
-        tar Jcvf wasmedge-tf.tar.xz include/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
-        tar -zcvf wasmedge-tflite.tar.gz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
-        tar Jcvf wasmedge-tflite.tar.xz include/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+        tar -zcvf wasmedge-tf.tar.gz include/wasmedge/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
+        tar Jcvf wasmedge-tf.tar.xz include/wasmedge/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
+        tar -zcvf wasmedge-tflite.tar.gz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+        tar Jcvf wasmedge-tflite.tar.xz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
         cd ..
         mv build/wasmedge-tf.tar.gz wasmedge-tf.tar.gz
         mv build/wasmedge-tf.tar.xz wasmedge-tf.tar.xz
