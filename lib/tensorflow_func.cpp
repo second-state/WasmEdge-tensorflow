@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2019-2022 Second State INC
+
 #include <string>
 #include <vector>
 
@@ -14,12 +16,12 @@ namespace Host {
 Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
     Runtime::Instance::MemoryInstance *MemInst, uint32_t ModBufPtr,
     uint32_t ModBufLen) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Create context and import graph.
+  // Create context and import graph.
   struct WasmEdgeTensorflowContext *Cxt = new WasmEdgeTensorflowContext();
   Cxt->Graph = TF_NewGraph();
   Cxt->Buffer =
@@ -35,7 +37,7 @@ Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
     return 0;
   }
 
-  /// Create session.
+  // Create session.
   Cxt->SessionOpts = TF_NewSessionOptions();
   Cxt->Session = TF_NewSession(Cxt->Graph, Cxt->SessionOpts, Cxt->Stat);
   if (TF_GetCode(Cxt->Stat) != TF_OK) {
@@ -51,7 +53,7 @@ Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
 
 Expect<void> WasmEdgeTensorflowDeleteSession::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   if (C != nullptr) {
     delete C;
@@ -62,17 +64,17 @@ Expect<void> WasmEdgeTensorflowDeleteSession::body(
 Expect<uint32_t>
 WasmEdgeTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
                                    uint64_t Cxt) {
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
 
-  /// Delete old output tensors
+  // Delete old output tensors
   for (auto T : C->OutputTensors) {
     if (T) {
       TF_DeleteTensor(T);
     }
   }
 
-  /// Run session
+  // Run session
   TF_SessionRun(C->Session,
                 // RunOptions
                 nullptr,
@@ -100,15 +102,15 @@ WasmEdgeTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
 Expect<uint64_t> WasmEdgeTensorflowGetOutputTensor::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
     uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
 
-  /// Find the output tensor
+  // Find the output tensor
   std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
   for (uint32_t I = 0; I < C->OutputNames.size(); ++I) {
     if (Name == C->OutputNames[I].first && Idx == C->OutputNames[I].second) {
@@ -122,7 +124,7 @@ Expect<uint64_t> WasmEdgeTensorflowGetOutputTensor::body(
 Expect<uint32_t>
 WasmEdgeTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
                                      uint64_t Tensor) {
-  /// Return tensor data length.
+  // Return tensor data length.
   TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
   if (T != nullptr) {
     return TF_TensorByteSize(T);
@@ -133,12 +135,12 @@ WasmEdgeTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
 Expect<void> WasmEdgeTensorflowGetTensorData::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
     uint32_t BufPtr) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Copy tensor data to buffer.
+  // Copy tensor data to buffer.
   TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
   if (T != nullptr) {
     uint8_t *Data = static_cast<uint8_t *>(TF_TensorData(T));
@@ -154,15 +156,15 @@ Expect<void> WasmEdgeTensorflowAppendInput::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt, uint32_t InputPtr,
     uint32_t InputLen, uint32_t Idx, uint32_t DimPtr, uint32_t DimCnt,
     uint32_t DataType, uint32_t TensorBufPtr, uint32_t TensorBufLen) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
 
-  /// Allocate tensor and data copying
+  // Allocate tensor and data copying
   TF_Tensor *Tensor = nullptr;
   if (DimCnt > 0) {
     Tensor = TF_AllocateTensor(static_cast<TF_DataType>(DataType),
@@ -178,7 +180,7 @@ Expect<void> WasmEdgeTensorflowAppendInput::body(
   }
   C->InputTensors.push_back(Tensor);
 
-  /// Store names and operations
+  // Store names and operations
   std::string Name(MemInst->getPointer<char *>(InputPtr), InputLen);
   C->InputNames.push_back({Name, Idx});
   C->Inputs.emplace_back(TF_Output{
@@ -190,17 +192,17 @@ Expect<void>
 WasmEdgeTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
                                      uint64_t Cxt, uint32_t OutputPtr,
                                      uint32_t OutputLen, uint32_t Idx) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
   C->OutputTensors.push_back(nullptr);
 
-  /// Store names and operations
+  // Store names and operations
   C->OutputNames.push_back({Name, Idx});
   C->Outputs.emplace_back(TF_Output{
       TF_GraphOperationByName(C->Graph, Name.c_str()), static_cast<int>(Idx)});

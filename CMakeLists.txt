@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2019-2022 Second State INC
 
 cmake_minimum_required(VERSION 3.11)
 cmake_policy(SET CMP0091 NEW)
@@ -36,7 +37,7 @@ if(NOT WASMEDGE_CORE_PATH)
   FetchContent_Declare(
     wasmedge
     GIT_REPOSITORY https://github.com/WasmEdge/WasmEdge.git
-    GIT_TAG 0.9.0
+    GIT_TAG 0.9.1-alpha.1
   )
 
   FetchContent_GetProperties(wasmedge)

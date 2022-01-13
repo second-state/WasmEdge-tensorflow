@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2019-2022 Second State INC
+
 #include "wasmedge/wasmedge-tensorflowlite.h"
 #include "tensorflowfake_module.h"
 #include "tensorflowlite_module.h"
@@ -18,5 +20,5 @@ WasmEdge_ImportObjectContext *WasmEdge_Tensorflow_ImportObjectCreateDummy() {
 }
 
 #ifdef __cplusplus
-} /// extern "C"
+} // extern "C"
 #endif

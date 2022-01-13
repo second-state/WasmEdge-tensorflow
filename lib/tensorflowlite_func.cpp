@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2019-2022 Second State INC
+
 #include <string>
 #include <vector>
 
@@ -14,12 +16,12 @@ namespace Host {
 Expect<uint64_t> WasmEdgeTensorflowLiteCreateSession::body(
     Runtime::Instance::MemoryInstance *MemInst, uint32_t ModBufPtr,
     uint32_t ModBufLen) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Create context and import graph.
+  // Create context and import graph.
   struct WasmEdgeTensorflowLiteContext *Cxt =
       new WasmEdgeTensorflowLiteContext();
   auto *Model =
@@ -45,7 +47,7 @@ Expect<uint64_t> WasmEdgeTensorflowLiteCreateSession::body(
 
 Expect<void> WasmEdgeTensorflowLiteDeleteSession::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
   if (C != nullptr) {
     delete C;
@@ -55,10 +57,10 @@ Expect<void> WasmEdgeTensorflowLiteDeleteSession::body(
 
 Expect<uint32_t> WasmEdgeTensorflowLiteRunSession::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
 
-  /// Run session
+  // Run session
   TfLiteStatus Stat = TfLiteInterpreterInvoke(C->Interp);
   if (Stat != TfLiteStatus::kTfLiteOk) {
     spdlog::error("wasmedge_tensorflowlite_run_session: Invokation failed.");
@@ -70,15 +72,15 @@ Expect<uint32_t> WasmEdgeTensorflowLiteRunSession::body(
 Expect<uint64_t> WasmEdgeTensorflowLiteGetOutputTensor::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
     uint32_t OutputPtr, uint32_t OutputLen) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
 
-  /// Find the output tensor
+  // Find the output tensor
   std::string Name(MemInst->getPointer<char *>(OutputPtr), OutputLen);
   uint32_t OutCnt = TfLiteInterpreterGetOutputTensorCount(C->Interp);
 
@@ -93,7 +95,7 @@ Expect<uint64_t> WasmEdgeTensorflowLiteGetOutputTensor::body(
 
 Expect<uint32_t> WasmEdgeTensorflowLiteGetTensorLen::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor) {
-  /// Return tensor data length.
+  // Return tensor data length.
   TfLiteTensor *T = reinterpret_cast<TfLiteTensor *>(Tensor);
   if (T != nullptr) {
     return TfLiteTensorByteSize(T);
@@ -104,12 +106,12 @@ Expect<uint32_t> WasmEdgeTensorflowLiteGetTensorLen::body(
 Expect<void> WasmEdgeTensorflowLiteGetTensorData::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
     uint32_t BufPtr) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Copy tensor data to buffer.
+  // Copy tensor data to buffer.
   TfLiteTensor *T = reinterpret_cast<TfLiteTensor *>(Tensor);
   if (T != nullptr) {
     uint8_t *Buf = MemInst->getPointer<uint8_t *>(BufPtr);
@@ -123,15 +125,15 @@ Expect<void> WasmEdgeTensorflowLiteGetTensorData::body(
 Expect<void> WasmEdgeTensorflowLiteAppendInput::body(
     Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt, uint32_t InputPtr,
     uint32_t InputLen, uint32_t TensorBufPtr, uint32_t TensorBufLen) {
-  /// Check memory instance from module.
+  // Check memory instance from module.
   if (MemInst == nullptr) {
     return Unexpect(ErrCode::ExecutionFailed);
   }
 
-  /// Context struct
+  // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
 
-  /// Find the input tensor
+  // Find the input tensor
   std::string Name(MemInst->getPointer<char *>(InputPtr), InputLen);
   uint32_t InCnt = TfLiteInterpreterGetInputTensorCount(C->Interp);
 
