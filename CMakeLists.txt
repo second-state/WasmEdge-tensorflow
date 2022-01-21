@@ -37,7 +37,7 @@ if(NOT WASMEDGE_CORE_PATH)
   FetchContent_Declare(
     wasmedge
     GIT_REPOSITORY https://github.com/WasmEdge/WasmEdge.git
-    GIT_TAG 0.9.1-alpha.1
+    GIT_TAG 0.9.1-beta.1
   )
 
   FetchContent_GetProperties(wasmedge)
