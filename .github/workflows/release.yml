@@ -40,7 +40,7 @@ jobs:
         prerelease: false
   build_and_upload_manylinux2014_x86_64:
     name: Build WasmEdge-TensorFlow on manylinux2014_x86_64 platform
-    needs: [create]
+    needs: create
     runs-on: ubuntu-latest
     container:
       image: wasmedge/wasmedge:manylinux2014_x86_64
@@ -54,8 +54,18 @@ jobs:
         export PATH="/toolchain/bin:$PATH"
         export CC=gcc
         export CXX=g++
-        rm -rf build
-        cmake -Bbuild -DCMAKE_BUILD_TYPE=Release .
+        export CPPFLAGS=-I/toolchain/include
+        export LDFLAGS=-L/toolchain/lib64
+        curl -s -L -O --remote-name-all https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2
+        echo "f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41  boost_1_76_0.tar.bz2" | sha256sum -c
+        bzip2 -dc boost_1_76_0.tar.bz2 | tar -xf -
+        if ! cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DBoost_NO_SYSTEM_PATHS=TRUE -DBOOST_INCLUDEDIR=$(pwd)/boost_1_76_0/; then
+            echo === CMakeOutput.log ===
+            cat build/CMakeFiles/CMakeOutput.log
+            echo === CMakeError.log ===
+            cat build/CMakeFiles/CMakeError.log
+            exit 1
+        fi
         cmake --build build
         cd build
         tar -zcvf wasmedge-tf.tar.gz include/wasmedge/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
@@ -103,4 +113,59 @@ jobs:
         upload_url: ${{ needs.create.outputs.upload_url }}
         asset_path: wasmedge-tflite.tar.xz
         asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
+        asset_content_type: application/x-xz
+  build_and_upload_manylinux2014_aarch64:
+    name: Build WasmEdge-TensorFlow on manylinux2014_aarch64 platform
+    needs: create
+    runs-on: ARM64
+    container:
+      image: wasmedge/wasmedge:manylinux2014_aarch64
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+    - name: Build manylinux2014_aarch64 package
+      run: |
+        export PATH="/toolchain/bin:$PATH"
+        export CC=gcc
+        export CXX=g++
+        export CPPFLAGS=-I/toolchain/include
+        export LDFLAGS=-L/toolchain/lib64
+        curl -s -L -O --remote-name-all https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2
+        echo "f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41  boost_1_76_0.tar.bz2" | sha256sum -c
+        bzip2 -dc boost_1_76_0.tar.bz2 | tar -xf -
+        if ! cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release -DBoost_NO_SYSTEM_PATHS=TRUE -DBOOST_INCLUDEDIR=$(pwd)/boost_1_76_0/; then
+            echo === CMakeOutput.log ===
+            cat build/CMakeFiles/CMakeOutput.log
+            echo === CMakeError.log ===
+            cat build/CMakeFiles/CMakeError.log
+            exit 1
+        fi
+        cmake --build build
+        cd build
+        tar -zcvf wasmedge-tflite.tar.gz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+        tar Jcvf wasmedge-tflite.tar.xz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+        cd ..
+        mv build/wasmedge-tflite.tar.gz wasmedge-tflite.tar.gz
+        mv build/wasmedge-tflite.tar.xz wasmedge-tflite.tar.xz
+        ls -alF
+    # Only tensorflow-lite has aarch64.
+    - name: Upload WasmEdge-tensorflowlite manylinux2014_aarch64 tar.gz package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create.outputs.upload_url }}
+        asset_path: wasmedge-tflite.tar.gz
+        asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_aarch64.tar.gz
+        asset_content_type: application/x-gzip
+    - name: Upload WasmEdge-tensorflowlite manylinux2014_aarch64 tar.xz package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create.outputs.upload_url }}
+        asset_path: wasmedge-tflite.tar.xz
+        asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_aarch64.tar.xz
         asset_content_type: application/x-xz

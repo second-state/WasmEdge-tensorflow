@@ -7,6 +7,7 @@ Features:
 
 * Added the copyright text.
 * Update the `WasmEdge` dependency to `0.9.1-beta.1`.
+* Added the Linux aarch64 support.
 
 ### 0.9.1-alpha.1 (2022-01-13)
 
