@@ -38,13 +38,27 @@ option(WASMEDGE_BUILD_AOT_RUNTIME "Enable WasmEdge LLVM-based ahead of time comp
 option(WASMEDGE_BUILD_SHARED_LIB "Generate the WasmEdge shared library." OFF)
 option(WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB "Generate the libwasmedge-tensorflow_c and libwasmedge-tensorflowlite_c shared libraries." ON)
 
+# Check the build architecture and system.
+if(ANDROID)
+  if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+  endif()
+elseif(UNIX)
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+  else()
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+  endif()
+else()
+  message(FATAL_ERROR "Unsupported system: ${CMAKE_SYSTEM_NAME}")
+endif()
+
 # Clone WasmEdge-core
 if(NOT WASMEDGE_CORE_PATH)
   include(FetchContent)
   FetchContent_Declare(
     wasmedge
     GIT_REPOSITORY https://github.com/WasmEdge/WasmEdge.git
-    GIT_TAG 0.9.1-beta.1
+    GIT_TAG 0.9.1-beta.2
   )
 
   FetchContent_GetProperties(wasmedge)
