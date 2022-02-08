@@ -88,7 +88,7 @@ if (WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB)
       FetchContent_Declare(
         wasmedgetensorflowdepslite
         URL      "https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/${WASMEDGE_DEPS_VERSION}/WasmEdge-tensorflow-deps-TFLite-${WASMEDGE_DEPS_VERSION}-android_aarch64.tar.gz"
-        URL_HASH "SHA256=102ad87a6cd7794a72ca3504a046b8960c928ba44c69b1a0587cdb21fe76588f"
+        URL_HASH "SHA256=a25dafad049cbc998c1f9682c57aec22b2fe5799eeffdd4ed19793a734cde8a4"
       )
       FetchContent_GetProperties(wasmedgetensorflowdepslite)
       if (NOT wasmedgetensorflowdepslite_POPULATED)

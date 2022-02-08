@@ -1,3 +1,15 @@
+### 0.9.1-rc.1 (2022-02-09)
+
+This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
+Please refer to the [WasmEdge 0.9.1-rc.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.9.1-rc.1) for more details.
+
+Features:
+
+* Added the copyright text.
+* Update the `WasmEdge` dependency to `0.9.1-rc.1`.
+* Added the Linux aarch64 support.
+* Added the Android aarch64 support.
+
 ### 0.9.1-beta.2 (2022-01-28)
 
 This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
@@ -183,7 +195,6 @@ Tools:
 
 * Remove tools. The tools will be in the new [repository](https://github.com/second-state/ssvm-tensorflow-tools).
 
-
 ### 0.7.3 (2021-02-03)
 
 This is a extension release for updating `ssvm-core`.
@@ -199,7 +210,6 @@ Tools:
 * `download_dependencies_tflite.sh` is the script to download and extract the required shared libraries for only `ssvm-tensorflow-lite` tool.
 * `download_dependencies_all.sh` is the script to download and extract all the required shared libraries.
 
-
 ### 0.7.2 (2020-12-24)
 
 This is a extension release for updating `ssvm-core`.
@@ -208,7 +218,6 @@ Features:
 
 * Update `ssvm-core` to version 0.7.2.
   * Please refer to the [SSVM 0.7.2](https://github.com/second-state/SSVM/releases/tag/0.7.2) for more details.
-
 
 ### 0.1.1 (2020-12-22)
 

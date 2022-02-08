@@ -205,9 +205,9 @@ jobs:
         fi
         cmake --build build
         cd build
-        tar -zcvf WasmEdge-tflite.tar.gz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite.so
+        tar -zcvf wasmedge-tflite.tar.gz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
         cd ..
-        mv build/WasmEdge-tflite.tar.gz WasmEdge-tflite.tar.gz
+        mv build/wasmedge-tflite.tar.gz wasmedge-tflite.tar.gz
         ls -alF
     - name: Upload WasmEdge-tensorflowlite android_aarch64 tar.gz package
       uses: actions/upload-release-asset@v1
