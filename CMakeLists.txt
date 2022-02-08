@@ -33,10 +33,17 @@ set(CMAKE_SKIP_RPATH ON)
 
 # List of WasmEdge options
 option(WASMEDGE_BUILD_TOOLS "Generate wasmedge and wasmedgec tools." OFF)
+# Libraries will be built in this project, hence the wasmedge and wasmedgec are not needed.
 option(WASMEDGE_BUILD_AOT_RUNTIME "Enable WasmEdge LLVM-based ahead of time compilation runtime." OFF)
-# AOT runtime is not needed in this stand-alone project
+# AOT runtime is not needed in this stand-alone project.
 option(WASMEDGE_BUILD_SHARED_LIB "Generate the WasmEdge shared library." OFF)
+# libwasmedge_c.so is not needed in this stand-alone project.
 option(WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB "Generate the libwasmedge-tensorflow_c and libwasmedge-tensorflowlite_c shared libraries." ON)
+
+# WasmEdge dependencies versions
+if(NOT WASMEDGE_DEPS_VERSION)
+  set(WASMEDGE_DEPS_VERSION "0.9.1-rc.1")
+endif()
 
 # Check the build architecture and system.
 if(ANDROID)
@@ -58,7 +65,7 @@ if(NOT WASMEDGE_CORE_PATH)
   FetchContent_Declare(
     wasmedge
     GIT_REPOSITORY https://github.com/WasmEdge/WasmEdge.git
-    GIT_TAG 0.9.1-beta.2
+    GIT_TAG ${WASMEDGE_DEPS_VERSION}
   )
 
   FetchContent_GetProperties(wasmedge)
@@ -86,8 +93,8 @@ else()
   endif()
 endif()
 
-message(STATUS "Set WasmEdge-core source path: ${WASMEDGE_CORE_PATH}")
-message(STATUS "Set WasmEdge-core binary path: ${WASMEDGE_CORE_BIN_PATH}")
+message(STATUS "WasmEdge-tensorflow: Set WasmEdge-core source path: ${WASMEDGE_CORE_PATH}")
+message(STATUS "WasmEdge-tensorflow: Set WasmEdge-core binary path: ${WASMEDGE_CORE_BIN_PATH}")
 
 # TensorFlow dependencies library
 add_subdirectory(utils/WasmEdge-tensorflow-deps)

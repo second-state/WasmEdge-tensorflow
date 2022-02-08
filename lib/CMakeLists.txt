@@ -81,4 +81,28 @@ if (WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB)
     wasmedgeCommon
     wasmedgeSystem
   )
+
+  # FIXME: This is a workaround solution. Linking libwasmedge-tensorflowlite_c.so for Android needs the libtensorflowlite_c.so.
+  if(ANDROID)
+    if(NOT TENSORFLOW_LITE_LIB)
+      FetchContent_Declare(
+        wasmedgetensorflowdepslite
+        URL      "https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/${WASMEDGE_DEPS_VERSION}/WasmEdge-tensorflow-deps-TFLite-${WASMEDGE_DEPS_VERSION}-android_aarch64.tar.gz"
+        URL_HASH "SHA256=102ad87a6cd7794a72ca3504a046b8960c928ba44c69b1a0587cdb21fe76588f"
+      )
+      FetchContent_GetProperties(wasmedgetensorflowdepslite)
+      if (NOT wasmedgetensorflowdepslite_POPULATED)
+        FetchContent_Populate(wasmedgetensorflowdepslite)
+      endif()
+
+      set(TENSORFLOW_LITE_LIB
+        "${wasmedgetensorflowdepslite_SOURCE_DIR}/libtensorflowlite_c.so"
+      )
+    endif()
+
+    target_link_libraries(wasmedge-tensorflowlite_c
+      PRIVATE
+      ${TENSORFLOW_LITE_LIB}
+    )
+  endif()
 endif()
