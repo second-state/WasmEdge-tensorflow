@@ -1,3 +1,19 @@
+### 0.10.0-alpha.1 (2022-05-06)
+
+This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
+Please refer to the [WasmEdge 0.10.0-alpha.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.10.0-alpha.1) for more details.
+
+Breaking changes:
+
+* Renamed C API `WasmEdge_Tensorflow_ImportObjectCreate` to `WasmEdge_Tensorflow_ModuleInstanceCreate`.
+* Renamed C API `WasmEdge_Tensorflow_ImportObjectCreateDummy` to `WasmEdge_Tensorflow_ModuleInstanceCreateDummy`.
+* Renamed C API `WasmEdge_TensorflowLite_ImportObjectCreate` to `WasmEdge_TensorflowLite_ModuleInstanceCreate`.
+
+Features:
+
+* Update the `WasmEdge` dependency to `0.10.0-alpha.1`.
+* Added the Darwin x86_64 support.
+
 ### 0.9.1 (2022-02-10)
 
 This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
