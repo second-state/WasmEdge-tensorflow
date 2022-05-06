@@ -58,14 +58,14 @@ jobs:
         cmake --build build
 
   build_darwin_x86_64:
-    name: MacOS x86_64
+    name: Darwin x86_64 platform
     runs-on: macos-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
         submodules: true
-    - name: Build WasmEdge-image for MacOS x86_64
+    - name: Build WasmEdge-image for Darwin x86_64
       run: |
         brew install llvm ninja boost cmake
         export PATH="/usr/local/opt/llvm/bin:$PATH"
