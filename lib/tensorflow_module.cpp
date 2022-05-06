@@ -10,7 +10,7 @@ namespace WasmEdge {
 namespace Host {
 
 WasmEdgeTensorflowModule::WasmEdgeTensorflowModule()
-    : ImportObject("wasmedge_tensorflow") {
+    : Runtime::Instance::ModuleInstance("wasmedge_tensorflow") {
   addHostFunc("wasmedge_tensorflow_create_session",
               std::make_unique<WasmEdgeTensorflowCreateSession>());
   addHostFunc("wasmedge_tensorflow_delete_session",

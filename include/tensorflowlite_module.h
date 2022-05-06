@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "runtime/importobj.h"
+#include "runtime/instance/module.h"
 
 namespace WasmEdge {
 namespace Host {
 
-class WasmEdgeTensorflowLiteModule : public Runtime::ImportObject {
+class WasmEdgeTensorflowLiteModule : public Runtime::Instance::ModuleInstance {
 public:
   WasmEdgeTensorflowLiteModule();
   ~WasmEdgeTensorflowLiteModule() = default;

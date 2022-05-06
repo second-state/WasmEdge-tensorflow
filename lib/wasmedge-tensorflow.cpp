@@ -8,8 +8,8 @@
 extern "C" {
 #endif
 
-WasmEdge_ImportObjectContext *WasmEdge_Tensorflow_ImportObjectCreate() {
-  return reinterpret_cast<WasmEdge_ImportObjectContext *>(
+WasmEdge_ModuleInstanceContext *WasmEdge_Tensorflow_ModuleInstanceCreate() {
+  return reinterpret_cast<WasmEdge_ModuleInstanceContext *>(
       new WasmEdge::Host::WasmEdgeTensorflowModule());
 }
 

@@ -28,31 +28,31 @@
 extern "C" {
 #endif
 
-/// Creation of the WasmEdge_ImportObjectContext for the wasmedge_tensorflowlite
-/// host functions.
+/// Creation of the WasmEdge_ModuleInstanceContext for the
+/// wasmedge_tensorflowlite host functions.
 ///
-/// The caller owns the object and should call `WasmEdge_ImportObjectDelete` to
-/// free it.
+/// The caller owns the object and should call `WasmEdge_ModuleInstanceDelete`
+/// to destroy it.
 ///
 /// \returns pointer to context, NULL if failed.
-WASMEDGE_CAPI_EXPORT extern WasmEdge_ImportObjectContext *
-WasmEdge_TensorflowLite_ImportObjectCreate();
+WASMEDGE_CAPI_EXPORT extern WasmEdge_ModuleInstanceContext *
+WasmEdge_TensorflowLite_ModuleInstanceCreate();
 
-/// Creation of the WasmEdge_ImportObjectContext for the wasmedge_tensorflow
+/// Creation of the WasmEdge_ModuleInstanceContext for the wasmedge_tensorflow
 /// fake host functions.
 ///
-/// This function will create a dummy wasmedge_tensorflow import object which
-/// the implementation of host functions are all empty. The dummy import object
-/// is used by the runners which only link to the tensorflow-lite shared library
-/// and need to accept WASM which want to import wasmedge_tensorflow host
-/// functions.
+/// This function will create a dummy wasmedge_tensorflow module instance which
+/// the implementation of host functions are all empty. The dummy module
+/// instance is used by the runners which only link to the tensorflow-lite
+/// shared library and need to accept WASM which want to import
+/// wasmedge_tensorflow host functions.
 ///
-/// The caller owns the object and should call `WasmEdge_ImportObjectDelete` to
-/// free it.
+/// The caller owns the object and should call `WasmEdge_ModuleInstanceDelete`
+/// to destroy it.
 ///
 /// \returns pointer to context, NULL if failed.
-WASMEDGE_CAPI_EXPORT extern WasmEdge_ImportObjectContext *
-WasmEdge_Tensorflow_ImportObjectCreateDummy();
+WASMEDGE_CAPI_EXPORT extern WasmEdge_ModuleInstanceContext *
+WasmEdge_Tensorflow_ModuleInstanceCreateDummy();
 
 #ifdef __cplusplus
 } // extern "C"

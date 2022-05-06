@@ -3,15 +3,16 @@
 
 #pragma once
 
-#include "runtime/importobj.h"
+#include "runtime/instance/module.h"
 #include "tensorflowfake_func.h"
 
 namespace WasmEdge {
 namespace Host {
 
-class WasmEdgeTensorflowFakeModule : public Runtime::ImportObject {
+class WasmEdgeTensorflowFakeModule : public Runtime::Instance::ModuleInstance {
 public:
-  WasmEdgeTensorflowFakeModule() : ImportObject("wasmedge_tensorflow") {
+  WasmEdgeTensorflowFakeModule()
+      : Runtime::Instance::ModuleInstance("wasmedge_tensorflow") {
     addHostFunc("wasmedge_tensorflow_create_session",
                 std::make_unique<WasmEdgeTensorflowFakeCreateSession>());
     addHostFunc("wasmedge_tensorflow_delete_session",

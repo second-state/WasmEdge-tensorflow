@@ -9,13 +9,14 @@
 extern "C" {
 #endif
 
-WasmEdge_ImportObjectContext *WasmEdge_TensorflowLite_ImportObjectCreate() {
-  return reinterpret_cast<WasmEdge_ImportObjectContext *>(
+WasmEdge_ModuleInstanceContext *WasmEdge_TensorflowLite_ModuleInstanceCreate() {
+  return reinterpret_cast<WasmEdge_ModuleInstanceContext *>(
       new WasmEdge::Host::WasmEdgeTensorflowLiteModule());
 }
 
-WasmEdge_ImportObjectContext *WasmEdge_Tensorflow_ImportObjectCreateDummy() {
-  return reinterpret_cast<WasmEdge_ImportObjectContext *>(
+WasmEdge_ModuleInstanceContext *
+WasmEdge_Tensorflow_ModuleInstanceCreateDummy() {
+  return reinterpret_cast<WasmEdge_ModuleInstanceContext *>(
       new WasmEdge::Host::WasmEdgeTensorflowFakeModule());
 }
 
