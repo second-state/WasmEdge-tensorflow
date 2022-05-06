@@ -26,6 +26,7 @@ jobs:
     - name: Get version
       id: prep
       run: |
+        git config --global --add safe.directory $(pwd)
         echo ::set-output name=version::$(git describe --tag)
     - name: Create Release
       id: create_release
@@ -38,6 +39,7 @@ jobs:
         body_path: .CurrentChangelog.md
         draft: true
         prerelease: true
+
   build_and_upload_manylinux2014_x86_64:
     name: Build WasmEdge-TensorFlow on manylinux2014_x86_64 platform
     needs: create
@@ -114,6 +116,7 @@ jobs:
         asset_path: wasmedge-tflite.tar.xz
         asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_x86_64.tar.xz
         asset_content_type: application/x-xz
+
   build_and_upload_manylinux2014_aarch64:
     name: Build WasmEdge-TensorFlow on manylinux2014_aarch64 platform
     needs: create
@@ -169,6 +172,55 @@ jobs:
         asset_path: wasmedge-tflite.tar.xz
         asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-manylinux2014_aarch64.tar.xz
         asset_content_type: application/x-xz
+
+  build_and_upload_darwin_x86_64:
+    name: MacOS x86_64
+    needs: create
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build WasmEdge-image for MacOS x86_64
+      run: |
+        brew install ninja boost cmake
+        export PATH="/toolchain/bin:$PATH"
+        export CC=gcc
+        export CXX=g++
+        export CPPFLAGS=-I/toolchain/include
+        export LDFLAGS=-L/toolchain/lib64
+        if ! cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release; then
+            echo === CMakeOutput.log ===
+            cat build/CMakeFiles/CMakeOutput.log
+            echo === CMakeError.log ===
+            cat build/CMakeFiles/CMakeError.log
+            exit 1
+        fi
+        cmake --build build
+        cd build
+        tar -zcvf wasmedge-tf.tar.gz include/wasmedge/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.dylib
+        tar -zcvf wasmedge-tflite.tar.gz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.dylib
+        cd ..
+        mv build/wasmedge-tf.tar.gz wasmedge-tf.tar.gz
+        mv build/wasmedge-tflite.tar.gz wasmedge-tflite.tar.gz
+        ls -alF
+    - name: Upload WasmEdge-tensorflow darwin_x86_64 tar.gz package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create.outputs.upload_url }}
+        asset_path: wasmedge-tf.tar.gz
+        asset_name: WasmEdge-tensorflow-${{ needs.create.outputs.version }}-darwin_x86_64.tar.gz
+        asset_content_type: application/x-gzip
+    - name: Upload WasmEdge-tensorflowlite darwin_x86_64 tar.gz package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create.outputs.upload_url }}
+        asset_path: wasmedge-tflite.tar.gz
+        asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-darwin_x86_64.tar.gz
+        asset_content_type: application/x-gzip
 
   build_and_upload_android:
     name: Android platforms

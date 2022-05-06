@@ -57,6 +57,29 @@ jobs:
         fi
         cmake --build build
 
+  build_darwin_x86_64:
+    name: MacOS x86_64
+    runs-on: macos-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build WasmEdge-image for MacOS x86_64
+      run: |
+        brew install ninja boost cmake
+        export PATH="/toolchain/bin:$PATH"
+        export CC=gcc
+        export CXX=g++
+        export CPPFLAGS=-I/toolchain/include
+        export LDFLAGS=-L/toolchain/lib64
+        if ! cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release; then
+            echo === CMakeOutput.log ===
+            cat build/CMakeFiles/CMakeOutput.log
+            echo === CMakeError.log ===
+            cat build/CMakeFiles/CMakeError.log
+            exit 1
+        fi
+        cmake --build build
+
   build_android:
     name: Android platforms
     runs-on: ubuntu-latest
