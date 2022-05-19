@@ -1,7 +1,7 @@
-### 0.10.0-alpha.1 (2022-05-06)
+### 0.10.0-alpha.2 (2022-05-20)
 
 This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
-Please refer to the [WasmEdge 0.10.0-alpha.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.10.0-alpha.1) for more details.
+Please refer to the [WasmEdge 0.10.0-alpha.2](https://github.com/WasmEdge/WasmEdge/releases/tag/0.10.0-alpha.2) for more details.
 
 Breaking changes:
 
@@ -11,7 +11,7 @@ Breaking changes:
 
 Features:
 
-* Update the `WasmEdge` dependency to `0.10.0-alpha.1`.
+* Update the `WasmEdge` dependency to `0.10.0-alpha.2`.
 * Added the Darwin x86_64 support.
 
 ### 0.9.1 (2022-02-10)
