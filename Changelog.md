@@ -1,11 +1,11 @@
-### 0.10.1-rc.1 (2022-07-26)
+### 0.10.1 (2022-07-28)
 
 This is the host function extension for [WasmEdge](https://github.com/WasmEdge/WasmEdge).
-Please refer to the [WasmEdge 0.10.1-rc.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.10.1-rc.1) for more details.
+Please refer to the [WasmEdge 0.10.1](https://github.com/WasmEdge/WasmEdge/releases/tag/0.10.1) for more details.
 
 Features:
 
-* Update the `WasmEdge` dependency to `0.10.1-rc.1`.
+* Update the `WasmEdge` dependency to `0.10.1`.
 
 ### 0.10.0 (2022-05-24)
 
