@@ -59,7 +59,7 @@ jobs:
 
   build_darwin_x86_64:
     name: Darwin x86_64 platform
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Checkout code
       uses: actions/checkout@v2

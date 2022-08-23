@@ -13,12 +13,13 @@
 namespace WasmEdge {
 namespace Host {
 
-Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint32_t ModBufPtr,
-    uint32_t ModBufLen) {
+Expect<uint64_t>
+WasmEdgeTensorflowCreateSession::body(const Runtime::CallingFrame &Frame,
+                                      uint32_t ModBufPtr, uint32_t ModBufLen) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Create context and import graph.
@@ -51,8 +52,9 @@ Expect<uint64_t> WasmEdgeTensorflowCreateSession::body(
   return static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(Cxt));
 }
 
-Expect<void> WasmEdgeTensorflowDeleteSession::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
+Expect<void>
+WasmEdgeTensorflowDeleteSession::body(const Runtime::CallingFrame &,
+                                      uint64_t Cxt) {
   // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   if (C != nullptr) {
@@ -62,7 +64,7 @@ Expect<void> WasmEdgeTensorflowDeleteSession::body(
 }
 
 Expect<uint32_t>
-WasmEdgeTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
+WasmEdgeTensorflowRunSession::body(const Runtime::CallingFrame &,
                                    uint64_t Cxt) {
   // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
@@ -99,12 +101,14 @@ WasmEdgeTensorflowRunSession::body(Runtime::Instance::MemoryInstance *MemInst,
   return 0;
 }
 
-Expect<uint64_t> WasmEdgeTensorflowGetOutputTensor::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
-    uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx) {
+Expect<uint64_t>
+WasmEdgeTensorflowGetOutputTensor::body(const Runtime::CallingFrame &Frame,
+                                        uint64_t Cxt, uint32_t OutputPtr,
+                                        uint32_t OutputLen, uint32_t Idx) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Context struct
@@ -122,7 +126,7 @@ Expect<uint64_t> WasmEdgeTensorflowGetOutputTensor::body(
 }
 
 Expect<uint32_t>
-WasmEdgeTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
+WasmEdgeTensorflowGetTensorLen::body(const Runtime::CallingFrame &,
                                      uint64_t Tensor) {
   // Return tensor data length.
   TF_Tensor *T = reinterpret_cast<TF_Tensor *>(Tensor);
@@ -132,12 +136,13 @@ WasmEdgeTensorflowGetTensorLen::body(Runtime::Instance::MemoryInstance *MemInst,
   return 0;
 }
 
-Expect<void> WasmEdgeTensorflowGetTensorData::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
-    uint32_t BufPtr) {
+Expect<void>
+WasmEdgeTensorflowGetTensorData::body(const Runtime::CallingFrame &Frame,
+                                      uint64_t Tensor, uint32_t BufPtr) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Copy tensor data to buffer.
@@ -153,12 +158,13 @@ Expect<void> WasmEdgeTensorflowGetTensorData::body(
 }
 
 Expect<void> WasmEdgeTensorflowAppendInput::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt, uint32_t InputPtr,
+    const Runtime::CallingFrame &Frame, uint64_t Cxt, uint32_t InputPtr,
     uint32_t InputLen, uint32_t Idx, uint32_t DimPtr, uint32_t DimCnt,
     uint32_t DataType, uint32_t TensorBufPtr, uint32_t TensorBufLen) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Context struct
@@ -189,12 +195,13 @@ Expect<void> WasmEdgeTensorflowAppendInput::body(
 }
 
 Expect<void>
-WasmEdgeTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
+WasmEdgeTensorflowAppendOutput::body(const Runtime::CallingFrame &Frame,
                                      uint64_t Cxt, uint32_t OutputPtr,
                                      uint32_t OutputLen, uint32_t Idx) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Context struct
@@ -209,9 +216,8 @@ WasmEdgeTensorflowAppendOutput::body(Runtime::Instance::MemoryInstance *MemInst,
   return {};
 }
 
-Expect<void>
-WasmEdgeTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                   uint64_t Cxt) {
+Expect<void> WasmEdgeTensorflowClearInput::body(const Runtime::CallingFrame &,
+                                                uint64_t Cxt) {
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   C->Inputs.clear();
   C->InputNames.clear();
@@ -224,9 +230,8 @@ WasmEdgeTensorflowClearInput::body(Runtime::Instance::MemoryInstance *MemInst,
   return {};
 }
 
-Expect<void>
-WasmEdgeTensorflowClearOutput::body(Runtime::Instance::MemoryInstance *MemInst,
-                                    uint64_t Cxt) {
+Expect<void> WasmEdgeTensorflowClearOutput::body(const Runtime::CallingFrame &,
+                                                 uint64_t Cxt) {
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowContext *>(Cxt);
   C->Outputs.clear();
   C->OutputNames.clear();

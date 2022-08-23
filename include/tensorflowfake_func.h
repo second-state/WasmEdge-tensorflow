@@ -4,8 +4,8 @@
 #pragma once
 
 #include "common/errcode.h"
+#include "runtime/callingframe.h"
 #include "runtime/hostfunc.h"
-#include "runtime/instance/memory.h"
 
 namespace WasmEdge {
 namespace Host {
@@ -19,8 +19,8 @@ public:
 class WasmEdgeTensorflowFakeCreateSession
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeCreateSession> {
 public:
-  Expect<uint64_t> body(Runtime::Instance::MemoryInstance *MemInst,
-                        uint32_t ModBufPtr, uint32_t ModBufLen) {
+  Expect<uint64_t> body(const Runtime::CallingFrame &, uint32_t ModBufPtr,
+                        uint32_t ModBufLen) {
     return 0;
   }
 };
@@ -28,16 +28,13 @@ public:
 class WasmEdgeTensorflowFakeDeleteSession
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeDeleteSession> {
 public:
-  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
-    return {};
-  }
+  Expect<void> body(const Runtime::CallingFrame &, uint64_t Cxt) { return {}; }
 };
 
 class WasmEdgeTensorflowFakeRunSession
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeRunSession> {
 public:
-  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
-                        uint64_t Cxt) {
+  Expect<uint32_t> body(const Runtime::CallingFrame &, uint64_t Cxt) {
     return 0;
   }
 };
@@ -45,9 +42,8 @@ public:
 class WasmEdgeTensorflowFakeGetOutputTensor
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeGetOutputTensor> {
 public:
-  Expect<uint64_t> body(Runtime::Instance::MemoryInstance *MemInst,
-                        uint64_t Cxt, uint32_t OutputPtr, uint32_t OutputLen,
-                        uint32_t Idx) {
+  Expect<uint64_t> body(const Runtime::CallingFrame &, uint64_t Cxt,
+                        uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx) {
     return 0;
   }
 };
@@ -55,8 +51,7 @@ public:
 class WasmEdgeTensorflowFakeGetTensorLen
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeGetTensorLen> {
 public:
-  Expect<uint32_t> body(Runtime::Instance::MemoryInstance *MemInst,
-                        uint64_t Tensor) {
+  Expect<uint32_t> body(const Runtime::CallingFrame &, uint64_t Tensor) {
     return 0;
   }
 };
@@ -64,7 +59,7 @@ public:
 class WasmEdgeTensorflowFakeGetTensorData
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeGetTensorData> {
 public:
-  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
+  Expect<void> body(const Runtime::CallingFrame &, uint64_t Tensor,
                     uint32_t BufPtr) {
     return {};
   }
@@ -73,7 +68,7 @@ public:
 class WasmEdgeTensorflowFakeAppendInput
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeAppendInput> {
 public:
-  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
+  Expect<void> body(const Runtime::CallingFrame &, uint64_t Cxt,
                     uint32_t InputPtr, uint32_t InputLen, uint32_t Idx,
                     uint32_t DimPtr, uint32_t DimCnt, uint32_t DataType,
                     uint32_t TensorBufPtr, uint32_t TensorBufLen) {
@@ -84,7 +79,7 @@ public:
 class WasmEdgeTensorflowFakeAppendOutput
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeAppendOutput> {
 public:
-  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
+  Expect<void> body(const Runtime::CallingFrame &, uint64_t Cxt,
                     uint32_t OutputPtr, uint32_t OutputLen, uint32_t Idx) {
     return {};
   }
@@ -93,17 +88,13 @@ public:
 class WasmEdgeTensorflowFakeClearInput
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeClearInput> {
 public:
-  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
-    return {};
-  }
+  Expect<void> body(const Runtime::CallingFrame &, uint64_t Cxt) { return {}; }
 };
 
 class WasmEdgeTensorflowFakeClearOutput
     : public WasmEdgeTensorflowFake<WasmEdgeTensorflowFakeClearOutput> {
 public:
-  Expect<void> body(Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
-    return {};
-  }
+  Expect<void> body(const Runtime::CallingFrame &, uint64_t Cxt) { return {}; }
 };
 
 } // namespace Host

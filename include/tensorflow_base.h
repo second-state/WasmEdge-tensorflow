@@ -10,6 +10,7 @@
 #include "tensorflow/c/c_api.h"
 
 #include "common/errcode.h"
+#include "runtime/callingframe.h"
 #include "runtime/hostfunc.h"
 
 namespace WasmEdge {

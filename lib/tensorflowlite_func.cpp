@@ -13,12 +13,14 @@
 namespace WasmEdge {
 namespace Host {
 
-Expect<uint64_t> WasmEdgeTensorflowLiteCreateSession::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint32_t ModBufPtr,
-    uint32_t ModBufLen) {
+Expect<uint64_t>
+WasmEdgeTensorflowLiteCreateSession::body(const Runtime::CallingFrame &Frame,
+                                          uint32_t ModBufPtr,
+                                          uint32_t ModBufLen) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Create context and import graph.
@@ -45,8 +47,9 @@ Expect<uint64_t> WasmEdgeTensorflowLiteCreateSession::body(
   return static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(Cxt));
 }
 
-Expect<void> WasmEdgeTensorflowLiteDeleteSession::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
+Expect<void>
+WasmEdgeTensorflowLiteDeleteSession::body(const Runtime::CallingFrame &,
+                                          uint64_t Cxt) {
   // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
   if (C != nullptr) {
@@ -55,8 +58,9 @@ Expect<void> WasmEdgeTensorflowLiteDeleteSession::body(
   return {};
 }
 
-Expect<uint32_t> WasmEdgeTensorflowLiteRunSession::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt) {
+Expect<uint32_t>
+WasmEdgeTensorflowLiteRunSession::body(const Runtime::CallingFrame &,
+                                       uint64_t Cxt) {
   // Context struct
   auto *C = reinterpret_cast<struct WasmEdgeTensorflowLiteContext *>(Cxt);
 
@@ -69,12 +73,14 @@ Expect<uint32_t> WasmEdgeTensorflowLiteRunSession::body(
   return 0;
 }
 
-Expect<uint64_t> WasmEdgeTensorflowLiteGetOutputTensor::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt,
-    uint32_t OutputPtr, uint32_t OutputLen) {
+Expect<uint64_t>
+WasmEdgeTensorflowLiteGetOutputTensor::body(const Runtime::CallingFrame &Frame,
+                                            uint64_t Cxt, uint32_t OutputPtr,
+                                            uint32_t OutputLen) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Context struct
@@ -93,8 +99,9 @@ Expect<uint64_t> WasmEdgeTensorflowLiteGetOutputTensor::body(
   return 0;
 }
 
-Expect<uint32_t> WasmEdgeTensorflowLiteGetTensorLen::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor) {
+Expect<uint32_t>
+WasmEdgeTensorflowLiteGetTensorLen::body(const Runtime::CallingFrame &,
+                                         uint64_t Tensor) {
   // Return tensor data length.
   TfLiteTensor *T = reinterpret_cast<TfLiteTensor *>(Tensor);
   if (T != nullptr) {
@@ -103,12 +110,13 @@ Expect<uint32_t> WasmEdgeTensorflowLiteGetTensorLen::body(
   return 0;
 }
 
-Expect<void> WasmEdgeTensorflowLiteGetTensorData::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Tensor,
-    uint32_t BufPtr) {
+Expect<void>
+WasmEdgeTensorflowLiteGetTensorData::body(const Runtime::CallingFrame &Frame,
+                                          uint64_t Tensor, uint32_t BufPtr) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Copy tensor data to buffer.
@@ -123,11 +131,12 @@ Expect<void> WasmEdgeTensorflowLiteGetTensorData::body(
 }
 
 Expect<void> WasmEdgeTensorflowLiteAppendInput::body(
-    Runtime::Instance::MemoryInstance *MemInst, uint64_t Cxt, uint32_t InputPtr,
+    const Runtime::CallingFrame &Frame, uint64_t Cxt, uint32_t InputPtr,
     uint32_t InputLen, uint32_t TensorBufPtr, uint32_t TensorBufLen) {
   // Check memory instance from module.
+  auto *MemInst = Frame.getMemoryByIndex(0);
   if (MemInst == nullptr) {
-    return Unexpect(ErrCode::ExecutionFailed);
+    return Unexpect(ErrCode::Value::HostFuncError);
   }
 
   // Context struct
