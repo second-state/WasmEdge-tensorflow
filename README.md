@@ -15,16 +15,16 @@ The official TensorFlow release only provide the TensorFlow shared library.
 You can download and install the pre-built shared libraries:
 
 ```bash
-wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.11.0-rc.1/WasmEdge-tensorflow-deps-TF-0.11.0-rc.1-manylinux2014_x86_64.tar.gz
-tar -zxvf WasmEdge-tensorflow-deps-TF-0.11.0-rc.1-manylinux2014_x86_64.tar.gz
-rm -f WasmEdge-tensorflow-deps-TF-0.11.0-rc.1-manylinux2014_x86_64.tar.gz
+wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.11.0/WasmEdge-tensorflow-deps-TF-0.11.0-manylinux2014_x86_64.tar.gz
+tar -zxvf WasmEdge-tensorflow-deps-TF-0.11.0-manylinux2014_x86_64.tar.gz
+rm -f WasmEdge-tensorflow-deps-TF-0.11.0-manylinux2014_x86_64.tar.gz
 ln -sf libtensorflow.so.2.6.0 libtensorflow.so.2
 ln -sf libtensorflow.so.2 libtensorflow.so
 ln -sf libtensorflow_framework.so.2.6.0 libtensorflow_framework.so.2
 ln -sf libtensorflow_framework.so.2 libtensorflow_framework.so
-wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.11.0-rc.1/WasmEdge-tensorflow-deps-TFLite-0.11.0-rc.1-manylinux2014_x86_64.tar.gz
-tar -zxvf WasmEdge-tensorflow-deps-TFLite-0.11.0-rc.1-manylinux2014_x86_64.tar.gz
-rm -f WasmEdge-tensorflow-deps-TFLite-0.11.0-rc.1-manylinux2014_x86_64.tar.gz
+wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.11.0/WasmEdge-tensorflow-deps-TFLite-0.11.0-manylinux2014_x86_64.tar.gz
+tar -zxvf WasmEdge-tensorflow-deps-TFLite-0.11.0-manylinux2014_x86_64.tar.gz
+rm -f WasmEdge-tensorflow-deps-TFLite-0.11.0-manylinux2014_x86_64.tar.gz
 ```
 
 ### Prepare the environment
@@ -59,7 +59,7 @@ sudo apt install -y clang
 ```bash
 git clone --recursive https://github.com/second-state/WasmEdge-tensorflow.git
 cd WasmEdge-tensorflow
-git checkout 0.11.0-rc.1
+git checkout 0.11.0
 ```
 
 ### Build WasmEdge-Tensorflow
