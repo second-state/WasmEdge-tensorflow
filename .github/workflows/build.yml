@@ -27,7 +27,7 @@ jobs:
             host_runner: ubuntu-latest
             docker_tag: manylinux2014_x86_64
           - name: manylinux2014 aarch64
-            host_runner: ARM64
+            host_runner: linux-arm64
             docker_tag: manylinux2014_aarch64
     name: ${{ matrix.name }} platform
     runs-on: ${{ matrix.host_runner }}

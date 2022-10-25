@@ -120,7 +120,7 @@ jobs:
   build_and_upload_manylinux2014_aarch64:
     name: Build WasmEdge-TensorFlow on manylinux2014_aarch64 platform
     needs: create
-    runs-on: ARM64
+    runs-on: linux-arm64
     container:
       image: wasmedge/wasmedge:manylinux2014_aarch64
     steps:
