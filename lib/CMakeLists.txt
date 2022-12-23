@@ -66,7 +66,7 @@ if(ANDROID)
 endif()
 
 # FIXME: This is a workaround solution.
-# Linking libwasmedge-tensorflow_c.dylib for MacOS needs the libtensorflow.2.6.0.dylib and libtensorflow_framework.2.6.0.dylib.
+# Linking libwasmedge-tensorflow_c.dylib for MacOS needs the libtensorflow_cc.2.6.0.dylib and libtensorflow_framework.2.6.0.dylib.
 # Linking libwasmedge-tensorflowlite_c.dylib for MacOS needs the libtensorflow_c.dylib.
 if(APPLE)
   # FIXME: Support M1 in the future.
@@ -88,20 +88,20 @@ if(APPLE)
     FetchContent_Declare(
       wasmedgetensorflowdeps
       URL      "https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/${WASMEDGE_DEPS_VERSION}/WasmEdge-tensorflow-deps-TF-${WASMEDGE_DEPS_VERSION}-darwin_x86_64.tar.gz"
-      URL_HASH "SHA256=df8720bb089528dd6930983d0ff23adbae75ad7b92451245702ce24002b5f3c4"
+      URL_HASH "SHA256=c1906b81b5db7f6f4fefce3c825a240a92f0d897dee41e2e1b294c9173132f2d"
     )
     FetchContent_GetProperties(wasmedgetensorflowdeps)
     if(NOT wasmedgetensorflowdeps_POPULATED)
       FetchContent_Populate(wasmedgetensorflowdeps)
       execute_process(
-        COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.2.6.0.dylib ${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow.2.dylib
-        COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow.2.dylib ${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow.dylib
+        COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_cc.2.6.0.dylib ${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow_cc.2.dylib
+        COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_cc.2.dylib ${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow_cc.dylib
         COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.2.6.0.dylib ${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow_framework.2.dylib
         COMMAND ${CMAKE_COMMAND} -E create_symlink libtensorflow_framework.2.dylib ${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow_framework.dylib
       )
     endif()
     set(WASMEDGE_TENSORFLOW_DEPS_TF_LIB
-      "${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow.2.6.0.dylib"
+      "${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow_cc.2.6.0.dylib"
       "${wasmedgetensorflowdeps_SOURCE_DIR}/libtensorflow_framework.2.6.0.dylib"
     )
   endif()

@@ -8,23 +8,23 @@ The [WasmEdge](https://github.com/WasmEdge/WasmEdge) is a high performance WebAs
 
 The WasmEdge Tensorflow shared library `libwasmedge-tensorflow_c.so` and `libwasmedge-tensorflowlite_c.so` are provided for the `WasmEdge-Tensorflow` extension of the WasmEdge shared library.
 The WasmEdge Tensorflow static library `libwasmedgeHostModuleWasmEdgeTensorflow.a` and `libwasmedgeHostModuleWasmEdgeTensorflowLite.a` are provided for statical linking when building executables with CMake.
-When linking with `libwasmedge-tensorflow_c.so` and `libwasmedgeHostModuleWasmEdgeTensorflow.a`, the TensorFlow shared libraries `libtensorflow.so` and `libtensorflow_framework.so` are required.
+When linking with `libwasmedge-tensorflow_c.so` and `libwasmedgeHostModuleWasmEdgeTensorflow.a`, the TensorFlow shared libraries `libtensorflow_cc.so` and `libtensorflow_framework.so` are required.
 When linking with `libwasmedge-tensorflowlite_c.so` and `libwasmedgeHostModuleWasmEdgeTensorflowLite.a`, the TensorFlow-Lite shared library `libtensorflowlite_c.so` is required.
 
 The official TensorFlow release only provide the TensorFlow shared library.
 You can download and install the pre-built shared libraries:
 
 ```bash
-wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.11.2/WasmEdge-tensorflow-deps-TF-0.11.2-manylinux2014_x86_64.tar.gz
-tar -zxvf WasmEdge-tensorflow-deps-TF-0.11.2-manylinux2014_x86_64.tar.gz
-rm -f WasmEdge-tensorflow-deps-TF-0.11.2-manylinux2014_x86_64.tar.gz
-ln -sf libtensorflow.so.2.6.0 libtensorflow.so.2
-ln -sf libtensorflow.so.2 libtensorflow.so
+wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.12.0-alpha.1/WasmEdge-tensorflow-deps-TF-0.12.0-alpha.1-manylinux2014_x86_64.tar.gz
+tar -zxvf WasmEdge-tensorflow-deps-TF-0.12.0-alpha.1-manylinux2014_x86_64.tar.gz
+rm -f WasmEdge-tensorflow-deps-TF-0.12.0-alpha.1-manylinux2014_x86_64.tar.gz
+ln -sf libtensorflow_cc.so.2.6.0 libtensorflow_cc.so.2
+ln -sf libtensorflow_cc.so.2 libtensorflow_cc.so
 ln -sf libtensorflow_framework.so.2.6.0 libtensorflow_framework.so.2
 ln -sf libtensorflow_framework.so.2 libtensorflow_framework.so
-wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.11.2/WasmEdge-tensorflow-deps-TFLite-0.11.2-manylinux2014_x86_64.tar.gz
-tar -zxvf WasmEdge-tensorflow-deps-TFLite-0.11.2-manylinux2014_x86_64.tar.gz
-rm -f WasmEdge-tensorflow-deps-TFLite-0.11.2-manylinux2014_x86_64.tar.gz
+wget https://github.com/second-state/WasmEdge-tensorflow-deps/releases/download/0.12.0-alpha.1/WasmEdge-tensorflow-deps-TFLite-0.12.0-alpha.1-manylinux2014_x86_64.tar.gz
+tar -zxvf WasmEdge-tensorflow-deps-TFLite-0.12.0-alpha.1-manylinux2014_x86_64.tar.gz
+rm -f WasmEdge-tensorflow-deps-TFLite-0.12.0-alpha.1-manylinux2014_x86_64.tar.gz
 ```
 
 ### Prepare the environment
@@ -59,7 +59,7 @@ sudo apt install -y clang
 ```bash
 git clone --recursive https://github.com/second-state/WasmEdge-tensorflow.git
 cd WasmEdge-tensorflow
-git checkout 0.11.2
+git checkout 0.12.0-alpha.1
 ```
 
 ### Build WasmEdge-Tensorflow
