@@ -20,7 +20,7 @@ jobs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
     - name: Get version
@@ -40,6 +40,54 @@ jobs:
         draft: true
         prerelease: true
 
+  build_and_upload_ubuntu:
+    name: Ubuntu 20.04 x86_64 platform
+    needs: create
+    runs-on: ubuntu-latest
+    container:
+      image: wasmedge/wasmedge:ubuntu-build-clang
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Build WasmEdge-tensorflow for Ubuntu 20.04 x86_64
+      run: |
+        git config --global --add safe.directory $(pwd)
+        if ! cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release; then
+            echo === CMakeOutput.log ===
+            cat build/CMakeFiles/CMakeOutput.log
+            echo === CMakeError.log ===
+            cat build/CMakeFiles/CMakeError.log
+            exit 1
+        fi
+        cmake --build build
+        cd build
+        tar -zcvf wasmedge-tf.tar.gz include/wasmedge/wasmedge-tensorflow.h lib/libwasmedge-tensorflow_c.so
+        tar -zcvf wasmedge-tflite.tar.gz include/wasmedge/wasmedge-tensorflowlite.h lib/libwasmedge-tensorflowlite_c.so
+        cd ..
+        mv build/wasmedge-tf.tar.gz wasmedge-tf.tar.gz
+        mv build/wasmedge-tflite.tar.gz wasmedge-tflite.tar.gz
+        ls -alF
+    - name: Upload WasmEdge-tensorflow Ubuntu 20.04 x86_64 tar.gz package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create.outputs.upload_url }}
+        asset_path: wasmedge-tf.tar.gz
+        asset_name: WasmEdge-tensorflow-${{ needs.create.outputs.version }}-ubuntu20.04_x86_64.tar.gz
+        asset_content_type: application/x-gzip
+    - name: Upload WasmEdge-tensorflowlite Ubuntu 20.04 x86_64 tar.gz package
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create.outputs.upload_url }}
+        asset_path: wasmedge-tflite.tar.gz
+        asset_name: WasmEdge-tensorflowlite-${{ needs.create.outputs.version }}-ubuntu20.04_x86_64.tar.gz
+        asset_content_type: application/x-gzip
+
   build_and_upload_manylinux2014_x86_64:
     name: Build WasmEdge-TensorFlow on manylinux2014_x86_64 platform
     needs: create
@@ -48,7 +96,7 @@ jobs:
       image: wasmedge/wasmedge:manylinux2014_x86_64
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
     - name: Build manylinux2014_x86_64 package
@@ -125,7 +173,7 @@ jobs:
       image: wasmedge/wasmedge:manylinux2014_aarch64
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
     - name: Build manylinux2014_aarch64 package
@@ -179,7 +227,7 @@ jobs:
     runs-on: macos-11
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
     - name: Build WasmEdge-tensorflow for Darwin x86_64
@@ -230,7 +278,7 @@ jobs:
       image: wasmedge/wasmedge:latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
     - name: Install dependency

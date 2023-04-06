@@ -35,7 +35,7 @@ jobs:
       image: wasmedge/wasmedge:${{ matrix.docker_tag }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
     - name: Build ${{ matrix.name }} package
@@ -57,15 +57,37 @@ jobs:
         fi
         cmake --build build
 
+  build_and_ubuntu:
+    name: Ubuntu 20.04 x86_64 platform
+    runs-on: ubuntu-latest
+    container:
+      image: wasmedge/wasmedge:ubuntu-build-clang
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+    - name: Build WasmEdge-tensorflow for Ubuntu 20.04 x86_64
+      run: |
+        git config --global --add safe.directory $(pwd)
+        if ! cmake -Bbuild -GNinja -DCMAKE_BUILD_TYPE=Release; then
+            echo === CMakeOutput.log ===
+            cat build/CMakeFiles/CMakeOutput.log
+            echo === CMakeError.log ===
+            cat build/CMakeFiles/CMakeError.log
+            exit 1
+        fi
+        cmake --build build
+
   build_darwin_x86_64:
     name: Darwin x86_64 platform
     runs-on: macos-11
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
-    - name: Build WasmEdge-image for Darwin x86_64
+    - name: Build WasmEdge-tensorflow for Darwin x86_64
       run: |
         brew install llvm@14 ninja boost cmake
         export LLVM_DIR="/usr/local/opt/llvm@14/lib/cmake"
@@ -87,7 +109,7 @@ jobs:
       image: wasmedge/wasmedge:latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: true
     - name: Install dependency
