@@ -42,7 +42,7 @@ option(WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB "Generate the libwasmedge-tensorflow
 
 # WasmEdge dependencies versions
 if(NOT WASMEDGE_DEPS_VERSION)
-  set(WASMEDGE_DEPS_VERSION "0.12.0")
+  set(WASMEDGE_DEPS_VERSION "0.12.1")
 endif()
 
 # Check the build architecture and system.
