@@ -21,18 +21,14 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container:
-      image: wasmedge/wasmedge:ubuntu-build-gcc
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Install clang-format-12
+    - name: Install clang-format-15
       run: |
-        apt update
-        apt install clang-format-12
+        sudo apt update
+        sudo apt install clang-format-15
     - name: Run clang-format
       run: |
-        bash ./.github/scripts/clang-format.sh `which clang-format-12`
-
+        bash ./.github/scripts/clang-format.sh `which clang-format-15`

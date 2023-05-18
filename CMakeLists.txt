@@ -40,23 +40,45 @@ option(WASMEDGE_BUILD_SHARED_LIB "Generate the WasmEdge shared library." OFF)
 # libwasmedge_c.so is not needed in this stand-alone project.
 option(WASMEDGE_TENSORFLOW_BUILD_SHARED_LIB "Generate the libwasmedge-tensorflow_c and libwasmedge-tensorflowlite_c shared libraries." ON)
 
+# WasmEdge repositories versions
+if(NOT WASMEDGE_REPO_VERSION)
+  set(WASMEDGE_REPO_VERSION "0.12.1")
+endif()
 # WasmEdge dependencies versions
 if(NOT WASMEDGE_DEPS_VERSION)
-  set(WASMEDGE_DEPS_VERSION "0.12.1")
+  set(WASMEDGE_DEPS_VERSION "TF-2.12.0-CC")
 endif()
 
 # Check the build architecture and system.
 if(ANDROID)
-  if(NOT CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    if(NOT WASMEDGE_TENSORFLOW_SYSTEM_NAME)
+      set(WASMEDGE_TENSORFLOW_SYSTEM_NAME "android_aarch64")
+    endif()
+  else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
   endif()
 elseif(APPLE)
   if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
+    if(NOT WASMEDGE_TENSORFLOW_SYSTEM_NAME)
+      set(WASMEDGE_TENSORFLOW_SYSTEM_NAME "darwin_x86_64")
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+    if(NOT WASMEDGE_TENSORFLOW_SYSTEM_NAME)
+      set(WASMEDGE_TENSORFLOW_SYSTEM_NAME "darwin_arm64")
+    endif()
   else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
   endif()
 elseif(UNIX)
-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+  if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
+    if(NOT WASMEDGE_TENSORFLOW_SYSTEM_NAME)
+      set(WASMEDGE_TENSORFLOW_SYSTEM_NAME "manylinux2014_x86_64")
+    endif()
+  elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    if(NOT WASMEDGE_TENSORFLOW_SYSTEM_NAME)
+      set(WASMEDGE_TENSORFLOW_SYSTEM_NAME "manylinux2014_aarch64")
+    endif()
   else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
   endif()
@@ -70,7 +92,7 @@ if(NOT WASMEDGE_CORE_PATH)
   FetchContent_Declare(
     wasmedge
     GIT_REPOSITORY https://github.com/WasmEdge/WasmEdge.git
-    GIT_TAG ${WASMEDGE_DEPS_VERSION}
+    GIT_TAG ${WASMEDGE_REPO_VERSION}
   )
 
   FetchContent_GetProperties(wasmedge)
