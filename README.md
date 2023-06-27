@@ -1,4 +1,6 @@
-# WasmEdge for Tensorflow Extension
+# WasmEdge for Tensorflow Extension (WILL BE DEPRECATED SOON)
+
+> The WasmEdge extension will be deprecated soon and be replaced by the [WasmEdge-Tensorflow plug-in](https://wasmedge.org/docs/contribute/source/plugin/tensorflow) and the [WasmEdge-TensorflowLite plug-in](https://wasmedge.org/docs/contribute/source/plugin/tensorflowlite).
 
 The [WasmEdge](https://github.com/WasmEdge/WasmEdge) is a high performance WebAssembly runtime optimized for server side applications. This project provides support for accessing with [Tensorflow C library](https://www.tensorflow.org/install/lang_c).
 
